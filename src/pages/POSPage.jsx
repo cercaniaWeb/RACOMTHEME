@@ -61,6 +61,8 @@ export default function POSPage() {
     lastSale,
     darkMode,
     toggleDarkMode,
+    isOnline,
+    offlineMode,
   } = useAppStore();
 
   const [isScanning, setIsScanning] = useState(false);
@@ -132,6 +134,82 @@ export default function POSPage() {
 
   }, [productCatalog, inventoryBatches, currentUser, searchTerm]);
 
+  // Show notification when going offline
+  React.useEffect(() => {
+    const handleOnline = () => {
+      alert('Conexión restaurada. Los datos se sincronizarán automáticamente.');
+    };
+
+    const handleOffline = () => {
+      alert('Sin conexión a Internet. La aplicación está trabajando en modo sin conexión.');
+    };
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
+
+  const solicitarAccesoCamara = async () => {
+    try {
+      // Check if we're in a secure context (HTTPS required for camera on many browsers)
+      if (!window.isSecureContext) {
+        console.warn('Camera access requires a secure context (HTTPS)');
+        alert('Para usar la cámara, la aplicación necesita una conexión segura (HTTPS).');
+        return false;
+      }
+      
+      // First check if mediaDevices is available
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        console.warn('navigator.mediaDevices is not supported in this browser');
+        alert('Tu navegador no soporta acceso a la cámara. Intenta con otro navegador.');
+        return false;
+      }
+      
+      const stream = await navigator.mediaDevices.getUserMedia({ 
+        video: { 
+          facingMode: 'environment' // Usa la cámara trasera en móviles
+        } 
+      });
+      
+      // Detiene el stream inmediatamente después de solicitarlo
+      stream.getTracks().forEach(track => track.stop());
+      return true;
+    } catch (err) {
+      console.error('Permiso de cámara denegado:', err);
+      
+      // Handle specific error cases
+      if (err.name === 'NotAllowedError') {
+        alert('Permiso de cámara denegado. Por favor, permite el acceso a la cámara en la configuración de tu navegador.');
+      } else if (err.name === 'NotFoundError' || err.name === 'OverconstrainedError') {
+        alert('No se encontró una cámara compatible. Verifica que tu dispositivo tenga cámara trasera.');
+      } else if (err.name === 'NotReadableError') {
+        alert('La cámara no está disponible. Puede estar en uso por otra aplicación.');
+      } else {
+        alert('Error al acceder a la cámara: ' + err.message);
+      }
+      
+      return false;
+    }
+  };
+
+  const toggleScanning = async () => {
+    // Solicita permiso de cámara antes de iniciar el escaneo
+    if (!isScanning) {
+      const tienePermiso = await solicitarAccesoCamara();
+      if (tienePermiso) {
+        setIsScanning(true);
+      } else {
+        alert('Se requiere acceso a la cámara para escanear códigos de barras. Por favor, permite el acceso en la configuración de tu navegador.');
+      }
+    } else {
+      setIsScanning(false);
+    }
+  };
+
   const { ref } = useZxing({
     onResult(result) {
       const scannedBarcode = result.getText();
@@ -141,10 +219,12 @@ export default function POSPage() {
         setIsScanning(false);
       } else {
         console.warn(`Product with barcode ${scannedBarcode} not found or out of stock in this location.`);
+        alert(`Producto con código ${scannedBarcode} no encontrado o sin existencias en esta tienda.`);
       }
     },
     onError(error) {
-      console.error(error);
+      console.error('Error en escaneo de código de barras:', error);
+      alert('Error al escanear el código de barras. Intente nuevamente.');
     },
   });
 
@@ -159,8 +239,15 @@ export default function POSPage() {
     setIsPaymentMethodModalOpen(true);
   };
 
-  const handlePaymentSuccess = (payment) => {
-    handleCheckout(payment);
+  const handlePaymentSuccess = async (payment) => {
+    const result = await handleCheckout(payment);
+    
+    // Handle offline mode result
+    if (result.offline) {
+      // Show a special message for offline transactions
+      alert('Venta procesada en modo sin conexión. Se sincronizará cuando haya conexión a Internet.');
+    }
+    
     setIsPaymentMethodModalOpen(false);
     setPostPaymentModalOpen(true); // Open post-payment options modal
   };
@@ -174,8 +261,20 @@ export default function POSPage() {
             <div>
               <h1 className="text-2xl font-bold">Punto de Venta</h1>
               <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>Tienda: {currentUser?.storeName || 'Principal'}</p>
+              {offlineMode && (
+                <div className="flex items-center mt-1">
+                  <div className="w-2 h-2 bg-red-500 rounded-full mr-2"></div>
+                  <span className="text-xs text-red-500 font-medium">Modo Sin Conexión</span>
+                </div>
+              )}
             </div>
             <div className="flex items-center space-x-2">
+              {!isOnline && (
+                <div className="flex items-center bg-yellow-100 text-yellow-800 px-2 py-1 rounded-md text-xs font-medium">
+                  <Zap size={14} className="mr-1" />
+                  <span>Sin conexión</span>
+                </div>
+              )}
               <Button onClick={toggleDarkMode} variant="outline" className="p-2">
                 {darkMode ? <Sun size={20} /> : <Moon size={20} />}
               </Button>
@@ -267,8 +366,9 @@ export default function POSPage() {
               className="w-full mt-3 py-4 text-lg" 
               size="lg"
               variant="primary"
+              disabled={offlineMode && cart.length === 0}
             >
-              Procesar Pago - ${subtotal.toLocaleString()}
+              {offlineMode ? 'Modo Sin Conexión - Procesar Pago Local' : `Procesar Pago - ${subtotal.toLocaleString()}`}
             </Button>
           </Card>
         </div>
@@ -278,7 +378,7 @@ export default function POSPage() {
             <div className="flex space-x-2">
               <Button onClick={() => setIsCalculatorModalOpen(true)} size="sm"><Calculator size={20} /></Button>
               <Button onClick={() => setIsProductCollectionModalOpen(true)} size="sm"><Package size={20} /></Button>
-              <Button onClick={() => setIsScanning(!isScanning)} size="sm">
+              <Button onClick={toggleScanning} size="sm">
                 <Scan size={20} />
               </Button>
             </div>
@@ -287,7 +387,7 @@ export default function POSPage() {
 
           {isScanning && (
             <div className="mb-4">
-              <video ref={ref} className="w-full h-32 md:h-48 bg-gray-200 rounded-xl"></video>
+              <video ref={ref} className="w-full max-w-md h-auto aspect-video bg-gray-200 rounded-xl mx-auto"></video>
               <p className="text-center text-sm text-gray-500 mt-2">Escaneando código de barras...</p>
             </div>
           )}
@@ -305,7 +405,11 @@ export default function POSPage() {
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
               {productsForSale.map(p => (
                 <div key={p.id} className={`relative rounded-xl p-3 text-center cursor-pointer transition-all duration-200 hover:scale-[1.02] ${darkMode ? 'bg-gray-700/80 hover:bg-gray-600/80' : 'bg-gray-100 hover:bg-gray-200'}`} onClick={() => addToCart(p)}>
-                   <div className="absolute top-1 right-1 bg-blue-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
+                   <div className={`absolute top-1 right-1 text-xs font-bold px-2 py-0.5 rounded-full ${
+                     p.stockInLocation < 10 ? 'bg-red-500 text-white' : 
+                     p.stockInLocation < 20 ? 'bg-yellow-500 text-gray-800' : 
+                     'bg-green-500 text-white'
+                   }`}>
                     {p.stockInLocation}
                   </div>
                   <div className="bg-gray-200 border-2 border-dashed rounded-xl w-16 h-16 mx-auto mb-2 flex items-center justify-center">

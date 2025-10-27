@@ -24,6 +24,7 @@ import {
   getCashClosings,
   initializeSupabaseCollections
 } from '../utils/supabaseAPI';
+import offlineStorage from '../utils/offlineStorage';
 import { auth, supabase } from '../config/firebase';
 
 
@@ -37,6 +38,8 @@ const useAppStore = create((set, get) => ({
   note: '', // New note state
   lastSale: null, // To store the last sale details for ticket printing
   darkMode: false, // New state for dark mode
+  isOnline: navigator.onLine, // Add online status
+  offlineMode: false, // Add offline mode flag
   
   // Catálogos
   products: [],
@@ -68,15 +71,108 @@ const useAppStore = create((set, get) => ({
     // Save preference to localStorage
     localStorage.setItem('darkMode', JSON.stringify(newDarkMode));
   },
+  
+  // Network status management
+  updateNetworkStatus: (isOnline) => {
+    set({ isOnline, offlineMode: !isOnline });
+    if (isOnline) {
+      // Try to sync pending operations when coming back online
+      get().syncPendingOperations();
+      // Reload data from server
+      if (get().currentUser) {
+        get().loadAllData();
+      }
+    }
+  },
+  
+  // Initialize network status listeners
+  initNetworkListeners: () => {
+    window.addEventListener('online', () => {
+      get().updateNetworkStatus(true);
+    });
+    
+    window.addEventListener('offline', () => {
+      get().updateNetworkStatus(false);
+    });
+  },
+  
+  // Sync pending operations when online
+  syncPendingOperations: async () => {
+    // Sync pending sales
+    try {
+      const pendingSales = await offlineStorage.getAllData('pendingSales');
+      if (pendingSales && pendingSales.length > 0) {
+        console.log(`Syncing ${pendingSales.length} pending sales...`);
+        
+        for (const sale of pendingSales) {
+          try {
+            // Remove the temporary offline properties
+            const { id, status, createdAt, ...saleData } = sale;
+            
+            // Save the sale to Firebase
+            const saleId = await addSale(saleData);
+            
+            // Remove from offline storage after successful sync
+            await offlineStorage.deleteData('pendingSales', sale.id);
+            
+            console.log(`Successfully synced sale ${sale.id} with new ID ${saleId}`);
+          } catch (error) {
+            console.error(`Error syncing sale ${sale.id}:`, error);
+          }
+        }
+        
+        // Reload sales history after sync
+        await get().loadSalesHistory();
+      }
+    } catch (error) {
+      console.error('Error syncing pending sales:', error);
+    }
+    
+    console.log('Finished syncing pending operations');
+  },
 
   // --- LÓGICA DE CARGA DE DATOS DESDE FIREBASE ---
+  loadAllData: async () => {
+    await Promise.all([
+      get().loadProducts(),
+      get().loadCategories(), 
+      get().loadUsers(),
+      get().loadStores(),
+      get().loadInventoryBatches(),
+      get().loadSalesHistory(),
+      get().loadClients(),
+      get().loadTransfers(),
+      get().loadShoppingList(),
+      get().loadExpenses(),
+      get().loadCashClosings(),
+    ]);
+  },
+  
   loadProducts: async () => {
     set({ isLoading: { ...get().isLoading, products: true } });
     try {
-      const products = await getProducts();
-      set({ products });
+      // Try to load from network first if online
+      if (get().isOnline) {
+        const products = await getProducts();
+        set({ products });
+        // Store in offline storage for later use
+        await Promise.all(products.map(product => 
+          offlineStorage.updateData('products', product.id, product)
+        ));
+      } else {
+        // Load from offline storage
+        const offlineProducts = await offlineStorage.getAllData('products');
+        set({ products: offlineProducts });
+      }
     } catch (error) {
       console.error("Error loading products:", error);
+      // Fallback to offline storage if network failed
+      try {
+        const offlineProducts = await offlineStorage.getAllData('products');
+        set({ products: offlineProducts });
+      } catch (offlineError) {
+        console.error("Error loading products from offline storage:", offlineError);
+      }
     } finally {
       set({ isLoading: { ...get().isLoading, products: false } });
     }
@@ -85,10 +181,25 @@ const useAppStore = create((set, get) => ({
   loadCategories: async () => {
     set({ isLoading: { ...get().isLoading, categories: true } });
     try {
-      const categories = await getCategories();
-      set({ categories });
+      if (get().isOnline) {
+        const categories = await getCategories();
+        set({ categories });
+        // Store in offline storage
+        await Promise.all(categories.map(category => 
+          offlineStorage.updateData('categories', category.id, category)
+        ));
+      } else {
+        const offlineCategories = await offlineStorage.getAllData('categories');
+        set({ categories: offlineCategories });
+      }
     } catch (error) {
       console.error("Error loading categories:", error);
+      try {
+        const offlineCategories = await offlineStorage.getAllData('categories');
+        set({ categories: offlineCategories });
+      } catch (offlineError) {
+        console.error("Error loading categories from offline storage:", offlineError);
+      }
     } finally {
       set({ isLoading: { ...get().isLoading, categories: false } });
     }
@@ -97,10 +208,25 @@ const useAppStore = create((set, get) => ({
   loadUsers: async () => {
     set({ isLoading: { ...get().isLoading, users: true } });
     try {
-      const users = await getUsers();
-      set({ users });
+      if (get().isOnline) {
+        const users = await getUsers();
+        set({ users });
+        // Store in offline storage
+        await Promise.all(users.map(user => 
+          offlineStorage.updateData('users', user.id, user)
+        ));
+      } else {
+        const offlineUsers = await offlineStorage.getAllData('users');
+        set({ users: offlineUsers });
+      }
     } catch (error) {
       console.error("Error loading users:", error);
+      try {
+        const offlineUsers = await offlineStorage.getAllData('users');
+        set({ users: offlineUsers });
+      } catch (offlineError) {
+        console.error("Error loading users from offline storage:", offlineError);
+      }
     } finally {
       set({ isLoading: { ...get().isLoading, users: false } });
     }
@@ -109,10 +235,25 @@ const useAppStore = create((set, get) => ({
   loadStores: async () => {
     set({ isLoading: { ...get().isLoading, stores: true } });
     try {
-      const stores = await getStores();
-      set({ stores });
+      if (get().isOnline) {
+        const stores = await getStores();
+        set({ stores });
+        // Store in offline storage
+        await Promise.all(stores.map(store => 
+          offlineStorage.updateData('stores', store.id, store)
+        ));
+      } else {
+        const offlineStores = await offlineStorage.getAllData('stores');
+        set({ stores: offlineStores });
+      }
     } catch (error) {
       console.error("Error loading stores:", error);
+      try {
+        const offlineStores = await offlineStorage.getAllData('stores');
+        set({ stores: offlineStores });
+      } catch (offlineError) {
+        console.error("Error loading stores from offline storage:", offlineError);
+      }
     } finally {
       set({ isLoading: { ...get().isLoading, stores: false } });
     }
@@ -121,10 +262,25 @@ const useAppStore = create((set, get) => ({
   loadInventoryBatches: async () => {
     set({ isLoading: { ...get().isLoading, inventory: true } });
     try {
-      const inventoryBatches = await getInventoryBatches();
-      set({ inventoryBatches });
+      if (get().isOnline) {
+        const inventoryBatches = await getInventoryBatches();
+        set({ inventoryBatches });
+        // Store in offline storage
+        await Promise.all(inventoryBatches.map(batch => 
+          offlineStorage.updateData('inventoryBatches', batch.inventoryId, batch)
+        ));
+      } else {
+        const offlineInventoryBatches = await offlineStorage.getAllData('inventoryBatches');
+        set({ inventoryBatches: offlineInventoryBatches });
+      }
     } catch (error) {
       console.error("Error loading inventory batches:", error);
+      try {
+        const offlineInventoryBatches = await offlineStorage.getAllData('inventoryBatches');
+        set({ inventoryBatches: offlineInventoryBatches });
+      } catch (offlineError) {
+        console.error("Error loading inventory batches from offline storage:", offlineError);
+      }
     } finally {
       set({ isLoading: { ...get().isLoading, inventory: false } });
     }
@@ -133,10 +289,26 @@ const useAppStore = create((set, get) => ({
   loadSalesHistory: async () => {
     set({ isLoading: { ...get().isLoading, sales: true } });
     try {
-      const salesHistory = await getSales();
-      set({ salesHistory });
+      if (get().isOnline) {
+        const salesHistory = await getSales();
+        set({ salesHistory });
+        // Store in offline storage (limit to last 100 sales for storage efficiency)
+        const limitedSales = salesHistory.slice(0, 100);
+        await Promise.all(limitedSales.map(sale => 
+          offlineStorage.updateData('sales', sale.saleId, sale)
+        ));
+      } else {
+        const offlineSales = await offlineStorage.getAllData('sales');
+        set({ salesHistory: offlineSales });
+      }
     } catch (error) {
       console.error("Error loading sales history:", error);
+      try {
+        const offlineSales = await offlineStorage.getAllData('sales');
+        set({ salesHistory: offlineSales });
+      } catch (offlineError) {
+        console.error("Error loading sales from offline storage:", offlineError);
+      }
     } finally {
       set({ isLoading: { ...get().isLoading, sales: false } });
     }
@@ -145,10 +317,25 @@ const useAppStore = create((set, get) => ({
   loadClients: async () => {
     set({ isLoading: { ...get().isLoading, clients: true } });
     try {
-      const clients = await getClients();
-      set({ clients });
+      if (get().isOnline) {
+        const clients = await getClients();
+        set({ clients });
+        // Store in offline storage
+        await Promise.all(clients.map(client => 
+          offlineStorage.updateData('clients', client.id, client)
+        ));
+      } else {
+        const offlineClients = await offlineStorage.getAllData('clients');
+        set({ clients: offlineClients });
+      }
     } catch (error) {
       console.error("Error loading clients:", error);
+      try {
+        const offlineClients = await offlineStorage.getAllData('clients');
+        set({ clients: offlineClients });
+      } catch (offlineError) {
+        console.error("Error loading clients from offline storage:", offlineError);
+      }
     } finally {
       set({ isLoading: { ...get().isLoading, clients: false } });
     }
@@ -401,16 +588,22 @@ const useAppStore = create((set, get) => ({
       return;
     }
 
-    const stockInLocation = inventoryBatches
-      .filter(batch => batch.productId === product.id && batch.locationId === storeId)
-      .reduce((sum, batch) => sum + batch.quantity, 0);
+    // For offline mode, we'll use the last known inventory
+    let stockInLocation = 0;
+    if (inventoryBatches && inventoryBatches.length > 0) {
+      stockInLocation = inventoryBatches
+        .filter(batch => batch.productId === product.id && batch.locationId === storeId)
+        .reduce((sum, batch) => sum + batch.quantity, 0);
+    } else {
+      // If no inventory data is available (offline), allow adding to cart
+      stockInLocation = Infinity;
+    }
 
     const itemInCart = cart.find(item => item.id === product.id);
     const quantityInCart = itemInCart ? itemInCart.quantity : 0;
 
     if (quantityInCart >= stockInLocation) {
       console.warn(`Cannot add more ${product.name} to cart. Stock limit reached.`);
-      // Here you would typically show a user-facing error message.
       return; 
     }
 
@@ -428,19 +621,30 @@ const useAppStore = create((set, get) => ({
         };
       }
     });
+    
+    // Save cart to offline storage
+    offlineStorage.saveCart(get().cart);
   },
-  removeFromCart: (productId) => set((state) => ({
-    cart: state.cart.filter(item => item.id !== productId),
-  })),
+  removeFromCart: (productId) => {
+    set((state) => ({
+      cart: state.cart.filter(item => item.id !== productId),
+    }));
+    // Save cart to offline storage
+    offlineStorage.saveCart(get().cart);
+  },
 
-  updateCartItemQuantity: (productId, quantity) => set((state) => ({
-    cart: state.cart.map(item =>
-      item.id === productId ? { ...item, quantity: quantity } : item
-    ).filter(item => item.quantity > 0),
-  })),
+  updateCartItemQuantity: (productId, quantity) => {
+    set((state) => ({
+      cart: state.cart.map(item =>
+        item.id === productId ? { ...item, quantity: quantity } : item
+      ).filter(item => item.quantity > 0),
+    }));
+    // Save cart to offline storage
+    offlineStorage.saveCart(get().cart);
+  },
 
   handleCheckout: async (payment) => {
-    const { cart, currentUser, inventoryBatches, discount, note } = get();
+    const { cart, currentUser, inventoryBatches, discount, note, isOnline } = get();
     const { cash, card, cardCommission, commissionInCash } = payment;
     const storeId = currentUser?.storeId;
 
@@ -497,6 +701,39 @@ const useAppStore = create((set, get) => ({
       storeId: storeId,
       date: new Date().toISOString(), // This will be set by Firebase serverTimestamp
     };
+
+    // If offline, store the sale for later sync
+    if (!isOnline) {
+      const offlineSaleId = `offline-sale-${Date.now()}`;
+      const offlineSale = {
+        ...saleDetails,
+        id: offlineSaleId,
+        status: 'pending',
+        createdAt: new Date().toISOString()
+      };
+      
+      // Store in offline storage
+      await offlineStorage.updateData('pendingSales', offlineSaleId, offlineSale);
+      
+      // Update inventory batches in offline storage
+      await Promise.all(updatedBatches.map(batch => 
+        offlineStorage.updateData('inventoryBatches', batch.inventoryId, batch)
+      ));
+      
+      // Update the state
+      set({ 
+        cart: [], 
+        lastSale: { ...saleDetails, saleId: offlineSaleId },
+        salesHistory: [...get().salesHistory, { ...saleDetails, saleId: offlineSaleId }],
+        discount: { type: 'none', value: 0 }, // Reset discount after checkout
+        note: '', // Reset note after checkout
+        inventoryBatches: updatedBatches.filter(b => b.quantity > 0),
+      });
+
+      get().checkAllAlerts();
+      
+      return { success: true, saleId: offlineSaleId, offline: true };
+    }
 
     try {
       // Save the sale to Firebase
@@ -934,6 +1171,9 @@ const useAppStore = create((set, get) => ({
       darkModePreference = JSON.parse(storedDarkMode);
     }
 
+    // Initialize network listeners for offline support
+    get().initNetworkListeners();
+
     // Initialize Supabase collections if needed
     await initializeSupabaseCollections();
 
@@ -955,6 +1195,8 @@ const useAppStore = create((set, get) => ({
     set({
       ticketSettings: initialTicketSettings, // Set merged settings
       darkMode: darkModePreference, // Set dark mode preference
+      isOnline: navigator.onLine, // Set initial network status
+      offlineMode: !navigator.onLine, // Set initial offline mode
     });
     get().checkAllAlerts();
   },
