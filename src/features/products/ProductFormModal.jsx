@@ -54,61 +54,9 @@ const ProductFormModal = ({ product, onClose }) => {
     }
   }, [product]);
 
-  const solicitarAccesoCamara = async () => {
-    try {
-      // Check if we're in a secure context (HTTPS required for camera on many browsers)
-      if (!window.isSecureContext) {
-        console.warn('Camera access requires a secure context (HTTPS)');
-        alert('Para usar la cámara, la aplicación necesita una conexión segura (HTTPS).');
-        return false;
-      }
-      
-      // First check if mediaDevices is available
-      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        console.warn('navigator.mediaDevices is not supported in this browser');
-        alert('Tu navegador no soporta acceso a la cámara. Intenta con otro navegador.');
-        return false;
-      }
-      
-      const stream = await navigator.mediaDevices.getUserMedia({ 
-        video: { 
-          facingMode: 'environment' // Usa la cámara trasera en móviles
-        } 
-      });
-      
-      // Detiene el stream inmediatamente después de solicitarlo
-      stream.getTracks().forEach(track => track.stop());
-      return true;
-    } catch (err) {
-      console.error('Permiso de cámara denegado:', err);
-      
-      // Handle specific error cases
-      if (err.name === 'NotAllowedError') {
-        alert('Permiso de cámara denegado. Por favor, permite el acceso a la cámara en la configuración de tu navegador.');
-      } else if (err.name === 'NotFoundError' || err.name === 'OverconstrainedError') {
-        alert('No se encontró una cámara compatible. Verifica que tu dispositivo tenga cámara trasera.');
-      } else if (err.name === 'NotReadableError') {
-        alert('La cámara no está disponible. Puede estar en uso por otra aplicación.');
-      } else {
-        alert('Error al acceder a la cámara: ' + err.message);
-      }
-      
-      return false;
-    }
-  };
-
   const toggleScanning = async () => {
-    // Solicita permiso de cámara antes de iniciar el escaneo
-    if (!isScanning) {
-      const tienePermiso = await solicitarAccesoCamara();
-      if (tienePermiso) {
-        setIsScanning(true);
-      } else {
-        alert('Se requiere acceso a la cámara para escanear códigos de barras. Por favor, permite el acceso en la configuración de tu navegador.');
-      }
-    } else {
-      setIsScanning(false);
-    }
+    // Solo cambiamos el estado de escaneo, react-zxing manejará el acceso a la cámara
+    setIsScanning(!isScanning);
   };
 
   const { ref } = useZxing({

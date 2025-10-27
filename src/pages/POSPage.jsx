@@ -22,11 +22,11 @@ import Input from '../components/ui/Input';
 import Card from '../components/ui/Card';
 import Modal from '../components/ui/Modal';
 import useAppStore from '../store/useAppStore';
-import { useZxing } from 'react-zxing';
 import Ticket from '../features/pos/Ticket';
 import { useReactToPrint } from 'react-to-print';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
+import { useZxing } from 'react-zxing';
 
 import EmployeeConsumptionModal from '../features/pos/EmployeeConsumptionModal';
 import CalculatorModal from '../features/pos/CalculatorModal';
@@ -40,6 +40,7 @@ import PreviousSalesModal from '../features/pos/PreviousSalesModal';
 import ScheduleVisitModal from '../features/pos/ScheduleVisitModal';
 import WithdrawalModal from '../features/pos/WithdrawalModal';
 import ProductCollectionModal from '../features/pos/ProductCollectionModal';
+import QRScanner from '../components/qr/QRScanner';
 
 
 
@@ -153,57 +154,17 @@ export default function POSPage() {
     };
   }, []);
 
-  const solicitarAccesoCamara = async () => {
-    try {
-      // Check if we're in a secure context (HTTPS required for camera on many browsers)
-      if (!window.isSecureContext) {
-        console.warn('Camera access requires a secure context (HTTPS)');
-        alert('Para usar la cámara, la aplicación necesita una conexión segura (HTTPS).');
-        return false;
-      }
-      
-      // First check if mediaDevices is available
-      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        console.warn('navigator.mediaDevices is not supported in this browser');
-        alert('Tu navegador no soporta acceso a la cámara. Intenta con otro navegador.');
-        return false;
-      }
-      
-      const stream = await navigator.mediaDevices.getUserMedia({ 
-        video: { 
-          facingMode: 'environment' // Usa la cámara trasera en móviles
-        } 
-      });
-      
-      // Detiene el stream inmediatamente después de solicitarlo
-      stream.getTracks().forEach(track => track.stop());
-      return true;
-    } catch (err) {
-      console.error('Permiso de cámara denegado:', err);
-      
-      // Handle specific error cases
-      if (err.name === 'NotAllowedError') {
-        alert('Permiso de cámara denegado. Por favor, permite el acceso a la cámara en la configuración de tu navegador.');
-      } else if (err.name === 'NotFoundError' || err.name === 'OverconstrainedError') {
-        alert('No se encontró una cámara compatible. Verifica que tu dispositivo tenga cámara trasera.');
-      } else if (err.name === 'NotReadableError') {
-        alert('La cámara no está disponible. Puede estar en uso por otra aplicación.');
-      } else {
-        alert('Error al acceder a la cámara: ' + err.message);
-      }
-      
-      return false;
-    }
-  };
-
   const toggleScanning = async () => {
-    // Solicita permiso de cámara antes de iniciar el escaneo
+    // Check if we're turning scanning on and if not, toggle it
     if (!isScanning) {
-      const tienePermiso = await solicitarAccesoCamara();
-      if (tienePermiso) {
+      // Request camera permissions before starting scan
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        stream.getTracks().forEach(track => track.stop()); // Stop the test stream
         setIsScanning(true);
-      } else {
-        alert('Se requiere acceso a la cámara para escanear códigos de barras. Por favor, permite el acceso en la configuración de tu navegador.');
+      } catch (err) {
+        console.error('Error accessing camera:', err);
+        alert('No se pudo acceder a la cámara. Por favor, verifica los permisos.');
       }
     } else {
       setIsScanning(false);
@@ -224,8 +185,14 @@ export default function POSPage() {
     },
     onError(error) {
       console.error('Error en escaneo de código de barras:', error);
-      alert('Error al escanear el código de barras. Intente nuevamente.');
+      // Don't show an alert on error as it can be spammy
     },
+    paused: !isScanning,
+    video: {
+      facingMode: 'environment', // Use back camera if available
+      width: { min: 640, ideal: 1280 },
+      height: { min: 480, ideal: 720 },
+    }
   });
 
   const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
