@@ -1,0 +1,183 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Estilos globales para mejorar la apariencia */
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: linear-gradient(135deg, #f0f9ff 0%, #f9fafb 100%); /* Gradiente suave en modo claro */
+  background-attachment: fixed;
+  line-height: 1.5;
+}
+
+/* Jerarquía tipográfica mejorada */
+h1, .text-h1 {
+  @apply text-3xl md:text-4xl font-bold tracking-tight;
+}
+
+h2, .text-h2 {
+  @apply text-2xl md:text-3xl font-bold tracking-tight;
+}
+
+h3, .text-h3 {
+  @apply text-xl md:text-2xl font-semibold tracking-tight;
+}
+
+h4, .text-h4 {
+  @apply text-lg md:text-xl font-semibold;
+}
+
+/* Estilos para texto de cuerpo */
+.text-body {
+  @apply text-base leading-relaxed;
+}
+
+.text-body-sm {
+  @apply text-sm leading-snug;
+}
+
+/* Estilos para texto de subtítulo */
+.text-subtitle {
+  @apply text-base font-medium text-gray-500 dark:text-gray-400;
+}
+
+/* Estilos para texto de encabezado de tabla */
+.text-table-header {
+  @apply text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider;
+}
+
+/* Estilos para texto de botón */
+.text-button {
+  @apply font-semibold;
+}
+
+/* Estilos para texto de enlace */
+.text-link {
+  @apply font-medium text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 underline-offset-4 hover:underline;
+}
+
+/* Estilos para texto descriptivo */
+.text-description {
+  @apply text-gray-600 dark:text-gray-300;
+}
+
+/* Mejorar el estilo de los selectores y inputs en general */
+select {
+  @apply rounded-xl border border-gray-300 bg-white/80 backdrop-blur-sm px-3 py-2 text-base focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:ring-opacity-50 transition duration-200 shadow-sm;
+}
+
+/* Estilo para scrollbars */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-gray-100 rounded-full;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-gradient-to-b from-gray-300 to-gray-400 rounded-full hover:from-gray-400 hover:to-gray-500;
+}
+
+.dark ::-webkit-scrollbar-track {
+  @apply bg-gray-800;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  @apply bg-gradient-to-b from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800;
+}
+
+/* Transiciones suaves para la mayoría de los elementos */
+* {
+  transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow, transform, backdrop-filter;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 200ms;
+}
+
+/* Estilos para elementos activos */
+button:active,
+input[type="button"]:active,
+input[type="submit"]:active,
+input[type="reset"]:active {
+  transform: scale(0.98);
+}
+
+/* Mejor contraste para textos */
+.text-gray-900 {
+  color: #111827 !important;
+}
+
+.text-gray-800 {
+  color: #1f2937 !important;
+}
+
+.text-gray-700 {
+  color: #374151 !important;
+}
+
+/* Mejor contraste en modo oscuro */
+.dark .text-gray-100 {
+  color: #f9fafb !important;
+}
+
+.dark .text-gray-200 {
+  color: #e5e7eb !important;
+}
+
+.dark .text-gray-300 {
+  color: #d1d5db !important;
+}
+
+/* Ajustes para modo oscuro */
+.dark body {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); /* Gradiente oscuro */
+  background-attachment: fixed;
+}
+
+/* Mejora de efectos de hover */
+.group:hover .group-hover\:scale-110 {
+  transform: scale(1.1);
+}
+
+.group:hover .group-hover\:-translate-y-1 {
+  transform: translateY(-0.25rem);
+}
+
+/* Efectos de sombra mejorados */
+.shadow-card {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.dark .shadow-card {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.25), 0 4px 6px -2px rgba(0, 0, 0, 0.15);
+}
+
+/* Transiciones mejoradas */
+.transition-custom {
+  transition: all 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+}
+
+/* Efecto de brillo en botones */
+.btn-glow {
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-glow::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: rgba(255, 255, 255, 0.1);
+  transform: rotate(30deg);
+  transition: all 0.6s ease;
+}
+
+.btn-glow:hover::after {
+  transform: rotate(30deg) translate(20%, 20%);
+}
