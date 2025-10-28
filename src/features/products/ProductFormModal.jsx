@@ -181,7 +181,10 @@ const ProductFormModal = ({ product, onClose }) => {
           ))}
         </select>
       </div>
-      {formData.categoryId && categories.find(cat => cat.id === formData.categoryId)?.subcategories.length > 0 && (
+      {formData.categoryId && (() => {
+        const selectedCategory = categories.find(cat => cat.id === formData.categoryId);
+        return selectedCategory && selectedCategory.subcategories && selectedCategory.subcategories.length > 0;
+      })() && (
         <div>
           <label htmlFor="subcategoryId" className="block text-sm font-medium text-gray-700">Subcategoría</label>
           <select
