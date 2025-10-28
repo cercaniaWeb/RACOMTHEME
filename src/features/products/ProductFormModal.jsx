@@ -72,6 +72,14 @@ const ProductFormModal = ({ product, onClose }) => {
       console.error('Error en escaneo de código de barras:', error);
       alert('Error al escanear el código de barras. Intente nuevamente.');
     },
+    enabled: isScanning,
+    formats: ['code_128', 'code_39', 'ean_13', 'ean_8', 'upc_a', 'upc_e', 'qr_code', 'data_matrix', 'pdf_417'],
+    constraints: {
+      facingMode: 'environment', // Preferrear la cámara trasera si está disponible
+      width: { ideal: 1280 },
+      height: { ideal: 720 }
+    },
+    delay: 500, // Retraso entre escaneos en milisegundos
   });
 
   const handleChange = (e) => {
@@ -228,8 +236,9 @@ const ProductFormModal = ({ product, onClose }) => {
         </div>
         {isScanning && (
           <div className="mt-2 flex flex-col items-center max-w-full overflow-hidden">
-            <video ref={ref} className="w-full max-w-xs h-auto max-h-32 bg-gray-200 rounded-md"></video>
+            <video ref={ref} className="w-full max-w-sm h-auto max-h-64 bg-gray-200 rounded-md border border-gray-300"></video>
             <p className="text-center text-sm text-gray-500 mt-1">Escaneando código de barras...</p>
+            <p className="text-center text-xs text-gray-400 mt-1">Apunte la cámara al código de barras</p>
           </div>
         )}
       </div>
