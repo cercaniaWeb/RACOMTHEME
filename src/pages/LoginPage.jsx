@@ -21,8 +21,14 @@ const LoginPage = () => {
     if (result.success) {
       if (result.user.role === 'admin' || result.user.role === 'gerente') {
         navigate('/admin');
-      } else if (result.user.role === 'cajera') {
-        navigate('/pos/1'); // Assuming storeId 1 for now
+      } else if (result.user.role === 'cashier' || result.user.role === 'cajera') { // Handle both variations
+        // Check if user has a store assigned
+        if (result.user.storeId) {
+          navigate(`/pos/${result.user.storeId}`);
+        } else {
+          // If no store is assigned to cashier, they can't access POS
+          setError('Usuario no tiene tienda asignada. Contacte al administrador.');
+        }
       }
     } else {
       setError(result.error);

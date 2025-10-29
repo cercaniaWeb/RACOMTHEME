@@ -1,0 +1,93 @@
+Error al analizar el valor para '-webkit-text-size-adjust'.  Declaración rechazada. login:141:29
+Propiedad desconocida '-moz-osx-font-smoothing'.  Declaración rechazada. login:1541:27
+Juego de reglas ignoradas debido a un mal selector. login:1736:27
+Juego de reglas ignoradas debido a un mal selector. login:1756:33
+Error registrando Service Worker: DOMException: The operation is insecure. notificationService.js:34:17
+Error loading inventory batches: DOMException: IDBDatabase.transaction: 'inventoryBatches' is not a known object store name
+    updateData offlineStorage.js:146
+    updateData offlineStorage.js:145
+    loadInventoryBatches useAppStore.js:368
+    loadInventoryBatches useAppStore.js:367
+useAppStore.js:375:15
+Error loading inventory batches from offline storage: DOMException: IDBDatabase.transaction: 'inventoryBatches' is not a known object store name
+    getAllData offlineStorage.js:127
+    getAllData offlineStorage.js:126
+    loadInventoryBatches useAppStore.js:377
+useAppStore.js:380:17
+Warning: Each child in a list should have a unique "key" prop.
+
+Check the render method of `InventoryPage`. See https://reactjs.org/link/warning-keys for more information.
+tr
+InventoryPage@http://localhost:5173/src/pages/InventoryPage.jsx:26:77
+RenderedRoute@http://localhost:5173/node_modules/.vite/deps/react-router-dom.js?v=72ee9f50:5624:23
+Outlet@http://localhost:5173/node_modules/.vite/deps/react-router-dom.js?v=72ee9f50:6452:20
+div
+main
+div
+AdminDashboardPage@http://localhost:5173/src/pages/AdminDashboardPage.jsx:43:67
+ProtectedRoute@http://localhost:5173/src/components/ProtectedRoute.jsx:21:24
+RenderedRoute@http://localhost:5173/node_modules/.vite/deps/react-router-dom.js?v=72ee9f50:5624:23
+Routes@http://localhost:5173/node_modules/.vite/deps/react-router-dom.js?v=72ee9f50:6517:16
+Router@http://localhost:5173/node_modules/.vite/deps/react-router-dom.js?v=72ee9f50:6460:16
+BrowserRouter@http://localhost:5173/node_modules/.vite/deps/react-router-dom.js?v=72ee9f50:9562:23
+Router
+div
+div
+NotificationProvider@http://localhost:5173/src/components/notifications/NotificationProvider.jsx:22:30
+App@http://localhost:5173/src/App.jsx:24:91 react_jsx-dev-runtime.js:64:38
+Error loading inventory batches: DOMException: IDBDatabase.transaction: 'inventoryBatches' is not a known object store name
+    updateData offlineStorage.js:146
+    updateData offlineStorage.js:145
+    loadInventoryBatches useAppStore.js:368
+    loadInventoryBatches useAppStore.js:367
+useAppStore.js:375:15
+Error loading inventory batches from offline storage: DOMException: IDBDatabase.transaction: 'inventoryBatches' is not a known object store name
+    getAllData offlineStorage.js:127
+    getAllData offlineStorage.js:126
+    loadInventoryBatches useAppStore.js:377
+useAppStore.js:380:17
+Error loading inventory batches: DOMException: IDBDatabase.transaction: 'inventoryBatches' is not a known object store name
+    updateData offlineStorage.js:146
+    updateData offlineStorage.js:145
+    loadInventoryBatches useAppStore.js:368
+    loadInventoryBatches useAppStore.js:367
+useAppStore.js:375:15
+Error loading inventory batches from offline storage: DOMException: IDBDatabase.transaction: 'inventoryBatches' is not a known object store name
+    getAllData offlineStorage.js:127
+    getAllData offlineStorage.js:126
+    loadInventoryBatches useAppStore.js:377
+useAppStore.js:380:17
+Uncaught TypeError: can't access property "length", categories.find(...).subcategories is null
+    InventoryPage InventoryPage.jsx:112
+    React 19
+InventoryPage.jsx:179:48
+Uncaught TypeError: can't access property "length", categories.find(...).subcategories is null
+    InventoryPage InventoryPage.jsx:112
+    React 20
+InventoryPage.jsx:179:48
+The above error occurred in the <InventoryPage> component:
+
+InventoryPage@http://localhost:5173/src/pages/InventoryPage.jsx:26:77
+RenderedRoute@http://localhost:5173/node_modules/.vite/deps/react-router-dom.js?v=72ee9f50:5624:23
+Outlet@http://localhost:5173/node_modules/.vite/deps/react-router-dom.js?v=72ee9f50:6452:20
+div
+main
+div
+AdminDashboardPage@http://localhost:5173/src/pages/AdminDashboardPage.jsx:43:67
+ProtectedRoute@http://localhost:5173/src/components/ProtectedRoute.jsx:21:24
+RenderedRoute@http://localhost:5173/node_modules/.vite/deps/react-router-dom.js?v=72ee9f50:5624:23
+Routes@http://localhost:5173/node_modules/.vite/deps/react-router-dom.js?v=72ee9f50:6517:16
+Router@http://localhost:5173/node_modules/.vite/deps/react-router-dom.js?v=72ee9f50:6460:16
+BrowserRouter@http://localhost:5173/node_modules/.vite/deps/react-router-dom.js?v=72ee9f50:9562:23
+Router
+div
+div
+NotificationProvider@http://localhost:5173/src/components/notifications/NotificationProvider.jsx:22:30
+App@http://localhost:5173/src/App.jsx:24:91
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries. chunk-WRD5HZVH.js:14032:23
+Uncaught TypeError: can't access property "length", categories.find(...).subcategories is null
+    InventoryPage InventoryPage.jsx:112
+    React 17
+InventoryPage.jsx:179:48

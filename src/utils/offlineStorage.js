@@ -4,7 +4,7 @@
 class OfflineStorage {
   constructor() {
     this.dbName = 'POSOfflineDB';
-    this.version = 1;
+    this.version = 2; // Incrementé la versión para forzar la actualización del esquema
     this.db = null;
   }
 
@@ -68,6 +68,12 @@ class OfflineStorage {
         
         if (!this.db.objectStoreNames.contains('pendingSales')) {
           const pendingSalesStore = this.db.createObjectStore('pendingSales', { keyPath: 'id' });
+        }
+        
+        if (!this.db.objectStoreNames.contains('inventoryBatches')) {
+          const inventoryBatchesStore = this.db.createObjectStore('inventoryBatches', { keyPath: 'inventoryId' });
+          inventoryBatchesStore.createIndex('productId', 'productId', { unique: false });
+          inventoryBatchesStore.createIndex('locationId', 'locationId', { unique: false });
         }
 
         console.log('Database setup complete');

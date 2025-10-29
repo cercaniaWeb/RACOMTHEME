@@ -67,7 +67,7 @@ const CategoryManagementModal = ({ onClose }) => {
   };
 
   return (
-    <div className="p-4 dark:text-white">
+    <div className="p-4 dark:text-white max-h-[70vh] overflow-y-auto">
       <h2 className="text-xl font-bold mb-4 dark:text-white">Gestión de Categorías</h2>
 
       <div className="mb-4">
@@ -81,11 +81,11 @@ const CategoryManagementModal = ({ onClose }) => {
             className="flex-grow dark:bg-gray-700 dark:border-gray-600 dark:text-white"
           />
           <select
-            value={newCategoryParent}
-            onChange={(e) => setNewCategoryParent(e.target.value)}
+            value={newCategoryParent || ''}
+            onChange={(e) => setNewCategoryParent(e.target.value || null)}
             className="flex-grow dark:bg-gray-700 dark:border-gray-600 dark:text-white"
           >
-            <option value={null} className="dark:bg-gray-700 dark:text-white">Categoría Principal</option>
+            <option value="" className="dark:bg-gray-700 dark:text-white">Categoría Principal</option>
             {categories.map(category => (
               <option key={category.id} value={category.id} className="dark:bg-gray-700 dark:text-white">{category.name}</option>
             ))}

@@ -1,0 +1,71 @@
+Error al analizar el valor para '-webkit-text-size-adjust'.  Declaración rechazada. login:141:29
+Propiedad desconocida '-moz-osx-font-smoothing'.  Declaración rechazada. login:1541:27
+Juego de reglas ignoradas debido a un mal selector. login:1736:27
+Juego de reglas ignoradas debido a un mal selector. login:1756:33
+Error registrando Service Worker: DOMException: The operation is insecure. notificationService.js:34:17
+Error loading inventory batches: DOMException: IDBDatabase.transaction: 'inventoryBatches' is not a known object store name
+    updateData offlineStorage.js:140
+    updateData offlineStorage.js:139
+useAppStore.js:375:15
+Error loading inventory batches from offline storage: DOMException: IDBDatabase.transaction: 'inventoryBatches' is not a known object store name
+    getAllData offlineStorage.js:121
+    getAllData offlineStorage.js:120
+    loadInventoryBatches useAppStore.js:377
+useAppStore.js:380:17
+Warning: Encountered two children with the same key, `1761732745516-tnmmfx4mr-1`. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted — the behavior is unsupported and could change in a future version.
+NotificationProvider@http://localhost:5173/src/components/notifications/NotificationProvider.jsx:22:30
+App@http://localhost:5173/src/App.jsx:24:91 chunk-WRD5HZVH.js:521:38
+Warning: Each child in a list should have a unique "key" prop.
+
+Check the render method of `InventoryPage`. See https://reactjs.org/link/warning-keys for more information.
+tr
+InventoryPage@http://localhost:5173/src/pages/InventoryPage.jsx:26:77
+RenderedRoute@http://localhost:5173/node_modules/.vite/deps/react-router-dom.js?v=72ee9f50:5624:23
+Outlet@http://localhost:5173/node_modules/.vite/deps/react-router-dom.js?v=72ee9f50:6452:20
+div
+main
+div
+AdminDashboardPage@http://localhost:5173/src/pages/AdminDashboardPage.jsx:43:67
+ProtectedRoute@http://localhost:5173/src/components/ProtectedRoute.jsx:21:24
+RenderedRoute@http://localhost:5173/node_modules/.vite/deps/react-router-dom.js?v=72ee9f50:5624:23
+Routes@http://localhost:5173/node_modules/.vite/deps/react-router-dom.js?v=72ee9f50:6517:16
+Router@http://localhost:5173/node_modules/.vite/deps/react-router-dom.js?v=72ee9f50:6460:16
+BrowserRouter@http://localhost:5173/node_modules/.vite/deps/react-router-dom.js?v=72ee9f50:9562:23
+Router
+div
+div
+NotificationProvider@http://localhost:5173/src/components/notifications/NotificationProvider.jsx:22:30
+App@http://localhost:5173/src/App.jsx:24:91 react_jsx-dev-runtime.js:64:38
+Warning: A component is changing a controlled input to be uncontrolled. This is likely caused by the value changing from a defined to undefined, which should not happen. Decide between using a controlled or uncontrolled input element for the lifetime of the component. More info: https://reactjs.org/link/controlled-components
+input
+div
+_c<@http://localhost:5173/src/components/ui/Input.jsx:20:43
+div
+form
+ProductFormModal@http://localhost:5173/src/features/products/ProductFormModal.jsx:24:26
+div
+div
+div
+Modal@http://localhost:5173/src/components/ui/Modal.jsx:21:15
+div
+InventoryPage@http://localhost:5173/src/pages/InventoryPage.jsx:26:77
+RenderedRoute@http://localhost:5173/node_modules/.vite/deps/react-router-dom.js?v=72ee9f50:5624:23
+Outlet@http://localhost:5173/node_modules/.vite/deps/react-router-dom.js?v=72ee9f50:6452:20
+div
+main
+div
+AdminDashboardPage@http://localhost:5173/src/pages/AdminDashboardPage.jsx:43:67
+ProtectedRoute@http://localhost:5173/src/components/ProtectedRoute.jsx:21:24
+RenderedRoute@http://localhost:5173/node_modules/.vite/deps/react-router-dom.js?v=72ee9f50:5624:23
+Routes@http://localhost:5173/node_modules/.vite/deps/react-router-dom.js?v=72ee9f50:6517:16
+Router@http://localhost:5173/node_modules/.vite/deps/react-router-dom.js?v=72ee9f50:6460:16
+BrowserRouter@http://localhost:5173/node_modules/.vite/deps/react-router-dom.js?v=72ee9f50:9562:23
+Router
+div
+div
+NotificationProvider@http://localhost:5173/src/components/notifications/NotificationProvider.jsx:22:30
+App@http://localhost:5173/src/App.jsx:24:91 chunk-WRD5HZVH.js:521:38
+    React 79
+    workLoop scheduler.development.js:266
+    flushWork scheduler.development.js:239
+    performWorkUntilDeadline scheduler.development.js:533

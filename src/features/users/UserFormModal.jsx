@@ -12,6 +12,7 @@ const UserFormModal = ({ user, onClose }) => {
     role: 'cashier',
     storeId: null,
   });
+  const [error, setError] = useState('');
 
   useEffect(() => {
     if (user) {
@@ -36,22 +37,43 @@ const UserFormModal = ({ user, onClose }) => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
+    // Clear error when user starts typing
+    if (error) setError('');
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Preparar los datos para enviar, asegurando que storeId se envíe correctamente
+    const userDataToSend = {
+      ...formData,
+      // Asegurar que storeId se envíe como está en el formulario
+      storeId: formData.storeId || null
+    };
+    
+    let result;
     if (user) {
       // Update user
-      updateUser(user.uid, formData);
+      result = await updateUser(user.id || user.uid, userDataToSend);
     } else {
       // Add new user
-      addUser(formData);
+      result = await addUser(userDataToSend);
     }
-    onClose();
+    
+    if (result.success) {
+      onClose();
+    } else {
+      setError(result.error || 'Ocurrió un error desconocido');
+    }
   };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4 dark:text-white">
+      {error && (
+        <div className="p-3 bg-red-100 text-red-700 rounded-md">
+          {error}
+        </div>
+      )}
       <div>
         <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Nombre</label>
         <Input

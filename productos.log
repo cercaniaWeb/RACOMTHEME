@@ -1,0 +1,57 @@
+Download the React DevTools for a better development experience: https://reactjs.org/link/react-devtools chunk-WRD5HZVH.js:21551:25
+useAppStore initialize function called. useAppStore.js:1402:13
+Loading ticketSettings from localStorage: 
+Object { headerText: "¡Gracias por tu compra!", footerText: "Vuelve pronto.", showQrCode: true, fontSize: "lg", logoUrl: "" }
+useAppStore.js:1419:15
+useAppStore initialize function called. useAppStore.js:1402:13
+App already initialized, skipping initialization useAppStore.js:1406:15
+SW registered:  
+ServiceWorkerRegistration { installing: null, waiting: null, active: ServiceWorker, navigationPreload: NavigationPreloadManager, scope: "http://localhost:5173/", updateViaCache: "imports", onupdatefound: null, pushManager: PushManager, cookies: CookieStoreManager }
+settings:26:23
+Error registrando Service Worker: DOMException: The operation is insecure. notificationService.js:34:17
+Service Worker registered with scope: http://localhost:5173/ main.jsx:12:15
+Auth state changed: INITIAL_SESSION 
+Object { access_token: "eyJhbGciOiJIUzI1NiIsImtpZCI6ImYxc1QzVkJncG5sU3haNkMiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BnYmVmcXpscnZqbnN5bWlnZm12LnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI2ODNiZWRlOS1iZWQyLTRhYjUtOGY4OS1mNGY4ZjUxNThlYmQiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzYxNzMyNDQ2LCJpYXQiOjE3NjE3Mjg4NDYsImVtYWlsIjoibHJvbWVyb3JlejE0QGdtYWlsLmNvbSIsInBob25lIjoiIiwiYXBwX21ldGFkYXRhIjp7InByb3ZpZGVyIjoiZW1haWwiLCJwcm92aWRlcnMiOlsiZW1haWwiXX0sInVzZXJfbWV0YWRhdGEiOnsiZW1haWxfdmVyaWZpZWQiOnRydWV9LCJyb2xlIjoiYXV0aGVudGljYXRlZCIsImFhbCI6ImFhbDEiLCJhbXIiOlt7Im1ldGhvZCI6InBhc3N3b3JkIiwidGltZXN0YW1wIjoxNzYxNzI4ODQ2fV0sInNlc3Npb25faWQiOiI2ODdlYjUyNS0zNzUyLTRmZWMtOGQ3Zi1kZDIxMzc5YzAwZTEiLCJpc19hbm9ueW1vdXMiOmZhbHNlfQ.ioFskaDH43rj_lopJEwWTUfaCDD4jrEsc214Klw0yjk", token_type: "bearer", expires_in: 3600, expires_at: 1761732446, refresh_token: "fbyqxoamaw6x", user: {…}, weak_password: null }
+useAppStore.js:119:15
+Database opened successfully 3 offlineStorage.js:22:17
+categories data updated successfully offlineStorage.js:145:17
+stores data updated successfully offlineStorage.js:145:17
+users data updated successfully offlineStorage.js:145:17
+categories data updated successfully offlineStorage.js:145:17
+stores data updated successfully offlineStorage.js:145:17
+users data updated successfully offlineStorage.js:145:17
+categories data updated successfully offlineStorage.js:145:17
+stores data updated successfully offlineStorage.js:145:17
+users data updated successfully 2 offlineStorage.js:145:17
+Auth state changed: SIGNED_IN 
+Object { access_token: "eyJhbGciOiJIUzI1NiIsImtpZCI6ImYxc1QzVkJncG5sU3haNkMiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BnYmVmcXpscnZqbnN5bWlnZm12LnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI2ODNiZWRlOS1iZWQyLTRhYjUtOGY4OS1mNGY4ZjUxNThlYmQiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzYxNzMyNDczLCJpYXQiOjE3NjE3Mjg4NzMsImVtYWlsIjoibHJvbWVyb3JlejE0QGdtYWlsLmNvbSIsInBob25lIjoiIiwiYXBwX21ldGFkYXRhIjp7InByb3ZpZGVyIjoiZW1haWwiLCJwcm92aWRlcnMiOlsiZW1haWwiXX0sInVzZXJfbWV0YWRhdGEiOnsiZW1haWxfdmVyaWZpZWQiOnRydWV9LCJyb2xlIjoiYXV0aGVudGljYXRlZCIsImFhbCI6ImFhbDEiLCJhbXIiOlt7Im1ldGhvZCI6InBhc3N3b3JkIiwidGltZXN0YW1wIjoxNzYxNzI4ODczfV0sInNlc3Npb25faWQiOiJmYzI2NDI3NS0wMzNiLTRkNTctYWRjOC1iYzNiOTNmZThlYjciLCJpc19hbm9ueW1vdXMiOmZhbHNlfQ.ReCT3Vmo9eOX8kP2qqwzkFveL8rdgJWeLsWDiol1tvU", token_type: "bearer", expires_in: 3600, expires_at: 1761732473, refresh_token: "rysuqb6m42ek", user: {…}, weak_password: null }
+useAppStore.js:119:15
+useAppStore initialize function called. useAppStore.js:1402:13
+App already initialized, skipping initialization useAppStore.js:1406:15
+Evento del sistema emitido: user_logged_in 
+Object { userId: "683bede9-bed2-4ab5-8f89-f4f8f5158ebd", userName: "Administrador", userEmail: "lromerorez14@gmail.com", role: "admin", storeId: undefined, timestamp: "2025-10-29T09:07:54.206Z" }
+systemEventService.js:47:13
+Manejando inicio de sesión de usuario: 
+Object { userId: "683bede9-bed2-4ab5-8f89-f4f8f5158ebd", userName: "Administrador", userEmail: "lromerorez14@gmail.com", role: "admin", storeId: undefined, timestamp: "2025-10-29T09:07:54.206Z" }
+systemEventService.js:92:13
+Warning: Encountered two children with the same key, `1761728874206-c3t728eg3-1`. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted — the behavior is unsupported and could change in a future version.
+NotificationProvider@http://localhost:5173/src/components/notifications/NotificationProvider.jsx:22:30
+App@http://localhost:5173/src/App.jsx:24:91 chunk-WRD5HZVH.js:521:38
+Intentando agregar producto con datos: 
+Object { storeId: "tienda1", categoryId: "8b173ac9-93d5-46b7-9176-1e59d38ad343", subcategoryId: "", name: "Desodorante eGo", price: 50, cost: 30, barcode: "75064860", unit: "unidad", image_url: null }
+useAppStore.js:1009:15
+Datos extraídos - storeId: tienda1 categoryId: 8b173ac9-93d5-46b7-9176-1e59d38ad343 subcategoryId: <empty string> rest: 
+Object { name: "Desodorante eGo", price: 50, cost: 30, barcode: "75064860", unit: "unidad", image_url: null }
+useAppStore.js:1012:15
+Intentando agregar producto con datos: 
+Object { name: "Desodorante eGo", price: 50, cost: 30, barcode: "75064860", unit: "unidad", image_url: null, categoryId: "8b173ac9-93d5-46b7-9176-1e59d38ad343", subcategoryId: "", createdAt: "2025-10-29T09:08:15.722Z", updatedAt: "2025-10-29T09:08:15.722Z" }
+supabaseAPI.js:34:11
+Datos mapeados para insertar en products: 
+Object { name: "Desodorante eGo", price: 50, cost: 30, barcode: "75064860", unit: "unidad", image_url: null, category_id: "8b173ac9-93d5-46b7-9176-1e59d38ad343", subcategory_id: "", created_at: "2025-10-29T09:08:15.722Z", updated_at: "2025-10-29T09:08:15.722Z" }
+supabaseAPI.js:78:11
+Error agregando producto: 
+Object { code: "22P02", details: null, hint: null, message: 'invalid input syntax for type uuid: ""' }
+supabaseAPI.js:87:13
+Error adding product: Error: invalid input syntax for type uuid: ""
+    addProduct supabaseAPI.js:88
+useAppStore.js:1052:15

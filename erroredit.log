@@ -1,0 +1,17 @@
+Error al analizar el valor para '-webkit-text-size-adjust'.  Declaración rechazada. inventory:141:29
+Propiedad desconocida '-moz-osx-font-smoothing'.  Declaración rechazada. inventory:1541:27
+Juego de reglas ignoradas debido a un mal selector. inventory:1736:27
+Juego de reglas ignoradas debido a un mal selector. inventory:1756:33
+Error registrando Service Worker: DOMException: The operation is insecure. notificationService.js:34:17
+Error actualizando producto: 
+Object { code: "22P02", details: null, hint: null, message: 'invalid input syntax for type uuid: ""' }
+supabaseAPI.js:156:13
+Error updating product: Error: invalid input syntax for type uuid: ""
+    updateProduct supabaseAPI.js:157
+useAppStore.js:1110:15
+Error actualizando producto: 
+Object { code: "22P02", details: null, hint: null, message: 'invalid input syntax for type uuid: ""' }
+supabaseAPI.js:156:13
+Error updating product: Error: invalid input syntax for type uuid: ""
+    updateProduct supabaseAPI.js:157
+useAppStore.js:1110:15

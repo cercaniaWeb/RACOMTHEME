@@ -1,0 +1,90 @@
+# 🎨 Guía de Diseño y Estilos para el Sistema POS Empresarial "Synapse"
+
+## 1. Visión Estética General
+
+El objetivo principal es crear una **interfaz de usuario (UI) excepcional, elegante, moderna y con un marcado carácter empresarial**. La aplicación debe transmitir profesionalismo, eficiencia y sofisticación, siendo visualmente atractiva y altamente usable. Nos alejamos de diseños sobrecargados, priorizando la claridad y la jerarquía visual a través de un enfoque minimalista y oscuro.
+
+---
+
+## 2. Elementos Clave del Diseño
+
+### 2.1. Paleta de Colores: "Dark Mode" Sofisticado
+
+* **Fondo Principal:** Tonalidades de gris oscuro a casi negro (ej. `#1A1A1A`, `#2D2D2D`). Esto proporciona una base sólida y reduce la fatiga visual.
+* **Superficies y Paneles:** Ligeramente más claros que el fondo principal para crear profundidad y separación (ej. `#282828`, `#383838`).
+* **Texto Principal:** Blanco o gris claro para una legibilidad óptima sobre fondos oscuros (ej. `#FFFFFF`, `#E0E0E0`).
+* **Texto Secundario/Deshabilitado:** Tonos de gris medio (ej. `#A0A0A0`, `#757575`).
+* **Color de Acento (Primario):** Un tono vibrante pero profesional (ej. un verde esmeralda ` #00C080 `, un azul profundo ` #007bff `, o un púrpura sutil ` #8A2BE2 `). Se utilizará para:
+    * Elementos interactivos (botones principales, enlaces).
+    * Gráficos y progreso.
+    * Íconos activos.
+    * Barras de progreso o estado.
+* **Colores de Estado:**
+    * **Éxito:** Verde (ej. `#28A745`)
+    * **Advertencia:** Amarillo/Naranja (ej. `#FFC107`)
+    * **Error:** Rojo (ej. `#DC3545`)
+
+### 2.2. Tipografía: Elegancia y Legibilidad
+
+* **Familia Tipográfica:** Se recomienda una familia **sans-serif moderna y limpia** que ofrezca buena legibilidad en tamaños pequeños y grandes. Ejemplos de familias deseables:
+    * **Inter**
+    * **Roboto**
+    * **Open Sans**
+    * **Lato**
+* **Jerarquía Tipográfica:**
+    * **Encabezados (H1, H2, H3):** Mayor tamaño y, posiblemente, un peso de fuente semibold o bold para una distinción clara.
+    * **Texto de Contenido:** Tamaño estándar y peso de fuente regular.
+    * **Texto Auxiliar/Pequeño:** Tamaño reducido y peso regular o light.
+
+### 2.3. Iconografía: Minimalista y Coherente
+
+* **Estilo:** Íconos de línea (outline) o rellenos, pero siempre **uniformes** en todo el sistema. Deben ser modernos, reconocibles y no recargados.
+* **Colores:** Utilizar el color de texto secundario para íconos inactivos y el **color de acento** para íconos activos o de notificación.
+
+### 2.4. Componentes de UI y Estilos Específicos
+
+* **Tarjetas (Cards):**
+    * Todos los bloques de contenido importantes deben estar encapsulados en "cards" con un fondo ligeramente más claro que el fondo general.
+    * Bordes ligeramente redondeados (ej. `border-radius: 8px-12px`).
+    * Sombra sutil para dar profundidad, pero sin distraer.
+* **Botones:**
+    * **Primarios:** Fondo con el **color de acento**, texto blanco. Efecto hover sutil (oscurecer/aclarar ligeramente el fondo).
+    * **Secundarios/Outline:** Borde con el color de acento o gris, fondo transparente o del color de la superficie.
+    * **Terciarios/Texto:** Solo texto, sin fondo ni borde, para acciones menos prominentes.
+    * **Bordes:** Ligeramente redondeados, consistentes con las tarjetas.
+* **Campos de Entrada (Input Fields):**
+    * Diseño limpio, con un borde sutil cuando está inactivo y un **borde con el color de acento** al enfocarse (focus state).
+    * Texto placeholder en gris claro.
+* **Gráficos:**
+    * Diseño minimalista y limpio.
+    * Utilizar el **color de acento** para líneas y barras de datos, o una gradiente sutil del color de acento para gráficos de área.
+    * Ejes y etiquetas discretos.
+* **Tablas:**
+    * Filas y columnas bien espaciadas.
+    * Headers con un fondo sutilmente diferente o un borde inferior.
+    * Resaltado de fila al hacer hover.
+    * Bordes internos muy sutiles o líneas divisorias apenas visibles.
+* **Navegación Lateral (Sidebar):**
+    * Fondo oscuro.
+    * Íconos y texto en color secundario.
+    * Elemento activo claramente resaltado con el **color de acento** (fondo sutil, barra lateral o cambio de color de ícono/texto).
+
+### 2.5. Animaciones y Transiciones (Sutiles)
+
+* Utilizar animaciones y transiciones CSS/JS suaves y rápidas para estados de hover, focus, aperturas de modales y cambios de ruta.
+* Deben ser sutiles y no distraer, mejorando la experiencia sin ralentizar la interfaz.
+
+---
+
+## 3. Coherencia y Responsividad
+
+* **Consistencia:** Es fundamental mantener una coherencia visual en todos los módulos y pantallas del sistema. Cualquier componente nuevo debe adherirse a esta guía de estilos.
+* **Responsividad:** Aunque el foco principal es desktop/tablet para el uso del POS, los elementos de diseño deben ser adaptables y lucir bien en diferentes resoluciones, especialmente los paneles de reporte que podrían ser vistos en pantallas más variadas.
+
+---
+
+## 4. Referencias Visuales (Prototipos Adjuntos)
+
+Los prototipos de imagen proporcionados (ej. vista principal POS, dashboard de análisis, gestión de inventario, configuración) sirven como **ejemplos visuales directos** del estilo y la atmósfera que se busca. El desarrollo debe aspirar a replicar fielmente esta dirección estética.
+
+---

@@ -1,0 +1,29 @@
+Error registrando Service Worker: DOMException: The operation is insecure. notificationService.js:34:17
+Warning: `value` prop on `select` should not be null. Consider using an empty string to clear the component or `undefined` for uncontrolled components.
+select
+div
+div
+div
+CategoryManagementModal@http://localhost:5173/src/features/products/CategoryManagementModal.jsx:23:33
+div
+div
+div
+Modal@http://localhost:5173/src/components/ui/Modal.jsx:21:15
+div
+SettingsPage@http://localhost:5173/src/pages/SettingsPage.jsx:29:124
+RenderedRoute@http://localhost:5173/node_modules/.vite/deps/react-router-dom.js?v=72ee9f50:5624:23
+Outlet@http://localhost:5173/node_modules/.vite/deps/react-router-dom.js?v=72ee9f50:6452:20
+div
+main
+div
+AdminDashboardPage@http://localhost:5173/src/pages/AdminDashboardPage.jsx:43:67
+ProtectedRoute@http://localhost:5173/src/components/ProtectedRoute.jsx:21:24
+RenderedRoute@http://localhost:5173/node_modules/.vite/deps/react-router-dom.js?v=72ee9f50:5624:23
+Routes@http://localhost:5173/node_modules/.vite/deps/react-router-dom.js?v=72ee9f50:6517:16
+Router@http://localhost:5173/node_modules/.vite/deps/react-router-dom.js?v=72ee9f50:6460:16
+BrowserRouter@http://localhost:5173/node_modules/.vite/deps/react-router-dom.js?v=72ee9f50:9562:23
+Router
+div
+div
+NotificationProvider@http://localhost:5173/src/components/notifications/NotificationProvider.jsx:22:30
+App@http://localhost:5173/src/App.jsx:24:91 chunk-WRD5HZVH.js:521:38

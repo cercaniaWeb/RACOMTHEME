@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useRef } from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
 import {
   Plus,
   Printer,
@@ -64,6 +64,7 @@ export default function POSPage() {
     toggleDarkMode,
     isOnline,
     offlineMode,
+    stores,
   } = useAppStore();
 
   const [isScanning, setIsScanning] = useState(false);
@@ -130,7 +131,6 @@ export default function POSPage() {
         ...product,
         stockInLocation: stockByProduct[product.id] || 0,
       }))
-      .filter(product => product.stockInLocation > 0)
       .filter(product => product.name.toLowerCase().includes(searchTerm.toLowerCase()));
 
   }, [productCatalog, inventoryBatches, currentUser, searchTerm]);
@@ -171,28 +171,74 @@ export default function POSPage() {
     }
   };
 
+  // Estado para mostrar indicador de procesamiento
+  const [isProcessing, setIsProcessing] = useState(false);
+  
+  // Contador de intentos fallidos para evitar spam de errores
+  const failedAttempts = useRef(0);
+  const maxFailedAttempts = 5;
+
   const { ref } = useZxing({
     onResult(result) {
+      // Evitar procesamiento múltiple del mismo código
+      if (isProcessing) return;
+      
+      setIsProcessing(true);
       const scannedBarcode = result.getText();
-      const product = productsForSale.find(p => p.barcodes.includes(scannedBarcode));
+      
+      // Validar que el código no esté vacío
+      if (!scannedBarcode || scannedBarcode.trim() === '') {
+        setIsProcessing(false);
+        return;
+      }
+      
+      const product = productsForSale.find(p => 
+        p.barcodes && (
+          (Array.isArray(p.barcodes) && p.barcodes.includes(scannedBarcode)) ||
+          (typeof p.barcodes === 'string' && p.barcodes.split(',').map(b => b.trim()).includes(scannedBarcode))
+        )
+      );
+      
       if (product) {
         addToCart(product);
         setIsScanning(false);
+        failedAttempts.current = 0; // Resetear contador de fallos
+        // Mostrar feedback visual de éxito
+        console.log(`Producto agregado: ${product.name}`);
       } else {
         console.warn(`Product with barcode ${scannedBarcode} not found or out of stock in this location.`);
-        alert(`Producto con código ${scannedBarcode} no encontrado o sin existencias en esta tienda.`);
+        // Solo mostrar alerta si no hemos excedido el límite de intentos fallidos
+        if (failedAttempts.current < maxFailedAttempts) {
+          alert(`Producto con código ${scannedBarcode} no encontrado o sin existencias en esta tienda.`);
+        }
+        failedAttempts.current++;
       }
+      setIsProcessing(false);
     },
     onError(error) {
-      console.error('Error en escaneo de código de barras:', error);
-      // Don't show an alert on error as it can be spammy
+      // Solo registrar errores importantes, no los comunes de "no se detecta código"
+      if (!error.message.includes('No MultiFormat Readers were able to detect the code')) {
+        console.error('Error en escaneo de código de barras:', error);
+      }
+      
+      // Resetear estado de procesamiento si hay un error
+      if (isProcessing) {
+        setIsProcessing(false);
+      }
     },
     paused: !isScanning,
     video: {
       facingMode: 'environment', // Use back camera if available
-      width: { min: 640, ideal: 1280 },
-      height: { min: 480, ideal: 720 },
-    }
+      width: { min: 640, ideal: 1920, max: 1920 }, // Mayor resolución para mejor detección
+      height: { min: 480, ideal: 1080, max: 1080 },
+      frameRate: { ideal: 30, max: 60 }, // Más cuadros por segundo
+      aspectRatio: 16/9, // Relación de aspecto común
+      focusMode: 'continuous', // Enfoque automático continuo si está disponible
+    },
+    // Configurar formatos específicos para mejorar la detección
+    formats: ['code_128', 'code_39', 'ean_13', 'ean_8', 'upc_a', 'upc_e', 'data_matrix'],
+    // Reducir el retraso entre escaneos para mayor responsividad
+    delay: 100,
   });
 
   const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
@@ -227,7 +273,9 @@ export default function POSPage() {
           <header className={`flex justify-between items-center ${darkMode ? 'text-white' : 'text-gray-800'}`}>
             <div>
               <h1 className="text-2xl font-bold">Punto de Venta</h1>
-              <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>Tienda: {currentUser?.storeName || 'Principal'}</p>
+              <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>Tienda: 
+                {currentUser?.storeId ? stores.find(s => s.id === currentUser.storeId)?.name || currentUser.storeId : 'No asignada'}
+              </p>
               {offlineMode && (
                 <div className="flex items-center mt-1">
                   <div className="w-2 h-2 bg-red-500 rounded-full mr-2"></div>

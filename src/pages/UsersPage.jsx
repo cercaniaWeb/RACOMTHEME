@@ -10,7 +10,12 @@ const UsersPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
 
-  const getStoreName = (storeId) => stores.find(s => s.id === storeId)?.name || storeId;
+  const getStoreName = (storeId) => {
+    // Handle both string and undefined/null cases
+    if (!storeId) return 'Ninguna';
+    const store = stores.find(s => s.id === storeId);
+    return store ? store.name : storeId;
+  };
 
   const handleOpenModal = (user = null) => {
     setEditingUser(user);
@@ -54,7 +59,7 @@ const UsersPage = () => {
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {users.map((user) => (
-                  <tr key={user.uid}>
+                  <tr key={user.id}>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{user.name}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{user.email}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{user.role}</td>
@@ -63,7 +68,7 @@ const UsersPage = () => {
                       <Button onClick={() => handleOpenModal(user)} className="text-indigo-600 hover:text-indigo-900 mr-4">
                         Editar
                       </Button>
-                      <Button onClick={() => handleDelete(user.uid)} className="text-red-600 hover:text-red-900">
+                      <Button onClick={() => handleDelete(user.id)} className="text-red-600 hover:text-red-900">
                         Eliminar
                       </Button>
                     </td>

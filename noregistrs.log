@@ -1,0 +1,66 @@
+[vite] connecting... client:495:9
+[vite] connected. client:618:15
+Download the React DevTools for a better development experience: https://reactjs.org/link/react-devtools chunk-WRD5HZVH.js:21551:25
+useAppStore initialize function called. useAppStore.js:1508:13
+Loading ticketSettings from localStorage: 
+Object { headerText: "¡Gracias por tu compra!", footerText: "Vuelve pronto.", showQrCode: true, fontSize: "lg", logoUrl: "" }
+useAppStore.js:1525:15
+useAppStore initialize function called. useAppStore.js:1508:13
+App already initialized, skipping initialization useAppStore.js:1512:15
+SW registered:  
+ServiceWorkerRegistration { installing: null, waiting: ServiceWorker, active: ServiceWorker, navigationPreload: NavigationPreloadManager, scope: "http://localhost:5173/", updateViaCache: "imports", onupdatefound: null, pushManager: PushManager, cookies: CookieStoreManager }
+inventory:26:23
+Error registrando Service Worker: DOMException: The operation is insecure. notificationService.js:34:17
+Service Worker registered with scope: http://localhost:5173/ main.jsx:12:15
+Auth state changed: INITIAL_SESSION 
+Object { access_token: "eyJhbGciOiJIUzI1NiIsImtpZCI6ImYxc1QzVkJncG5sU3haNkMiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BnYmVmcXpscnZqbnN5bWlnZm12LnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI2ODNiZWRlOS1iZWQyLTRhYjUtOGY4OS1mNGY4ZjUxNThlYmQiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzYxNzQ1OTU4LCJpYXQiOjE3NjE3NDIzNTgsImVtYWlsIjoibHJvbWVyb3JlejE0QGdtYWlsLmNvbSIsInBob25lIjoiIiwiYXBwX21ldGFkYXRhIjp7InByb3ZpZGVyIjoiZW1haWwiLCJwcm92aWRlcnMiOlsiZW1haWwiXX0sInVzZXJfbWV0YWRhdGEiOnsiZW1haWxfdmVyaWZpZWQiOnRydWV9LCJyb2xlIjoiYXV0aGVudGljYXRlZCIsImFhbCI6ImFhbDEiLCJhbXIiOlt7Im1ldGhvZCI6InBhc3N3b3JkIiwidGltZXN0YW1wIjoxNzYxNzQyMzU4fV0sInNlc3Npb25faWQiOiI3NGI2ZjQ3OC1jZDJiLTRmYmYtOWFkMy01ZDg4M2M3YmRkZWYiLCJpc19hbm9ueW1vdXMiOmZhbHNlfQ.BkLcnQkOY0O3draH1xJzId6GV8lH3k6G1h31jJFHDus", token_type: "bearer", expires_in: 3600, expires_at: 1761745958, refresh_token: "22nlvq4zkdzr", user: {…}, weak_password: null }
+useAppStore.js:120:15
+useAppStore initialize function called. useAppStore.js:1508:13
+App already initialized, skipping initialization useAppStore.js:1512:15
+Evento del sistema emitido: user_logged_in 
+Object { userId: "683bede9-bed2-4ab5-8f89-f4f8f5158ebd", userName: "Administrador", userEmail: "lromerorez14@gmail.com", role: "admin", storeId: "tienda1", timestamp: "2025-10-29T12:52:39.023Z" }
+systemEventService.js:47:13
+Manejando inicio de sesión de usuario: 
+Object { userId: "683bede9-bed2-4ab5-8f89-f4f8f5158ebd", userName: "Administrador", userEmail: "lromerorez14@gmail.com", role: "admin", storeId: "tienda1", timestamp: "2025-10-29T12:52:39.023Z" }
+systemEventService.js:92:13
+Database opened successfully 22 offlineStorage.js:22:17
+products data updated successfully offlineStorage.js:151:17
+Database opened successfully 2 offlineStorage.js:22:17
+inventoryBatches data updated successfully offlineStorage.js:151:17
+categories data updated successfully offlineStorage.js:151:17
+stores data updated successfully offlineStorage.js:151:17
+users data updated successfully offlineStorage.js:151:17
+products data updated successfully offlineStorage.js:151:17
+inventoryBatches data updated successfully offlineStorage.js:151:17
+categories data updated successfully offlineStorage.js:151:17
+stores data updated successfully offlineStorage.js:151:17
+users data updated successfully offlineStorage.js:151:17
+products data updated successfully offlineStorage.js:151:17
+inventoryBatches data updated successfully offlineStorage.js:151:17
+categories data updated successfully offlineStorage.js:151:17
+stores data updated successfully offlineStorage.js:151:17
+users data updated successfully offlineStorage.js:151:17
+products data updated successfully offlineStorage.js:151:17
+inventoryBatches data updated successfully offlineStorage.js:151:17
+users data updated successfully offlineStorage.js:151:17
+products data updated successfully offlineStorage.js:151:17
+inventoryBatches data updated successfully offlineStorage.js:151:17
+users data updated successfully offlineStorage.js:151:17
+products data updated successfully offlineStorage.js:151:17
+inventoryBatches data updated successfully offlineStorage.js:151:17
+users data updated successfully offlineStorage.js:151:17
+Auth state changed: SIGNED_IN 
+Object { access_token: "eyJhbGciOiJIUzI1NiIsImtpZCI6ImYxc1QzVkJncG5sU3haNkMiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3BnYmVmcXpscnZqbnN5bWlnZm12LnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI2ODNiZWRlOS1iZWQyLTRhYjUtOGY4OS1mNGY4ZjUxNThlYmQiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzYxNzQ1OTU4LCJpYXQiOjE3NjE3NDIzNTgsImVtYWlsIjoibHJvbWVyb3JlejE0QGdtYWlsLmNvbSIsInBob25lIjoiIiwiYXBwX21ldGFkYXRhIjp7InByb3ZpZGVyIjoiZW1haWwiLCJwcm92aWRlcnMiOlsiZW1haWwiXX0sInVzZXJfbWV0YWRhdGEiOnsiZW1haWxfdmVyaWZpZWQiOnRydWV9LCJyb2xlIjoiYXV0aGVudGljYXRlZCIsImFhbCI6ImFhbDEiLCJhbXIiOlt7Im1ldGhvZCI6InBhc3N3b3JkIiwidGltZXN0YW1wIjoxNzYxNzQyMzU4fV0sInNlc3Npb25faWQiOiI3NGI2ZjQ3OC1jZDJiLTRmYmYtOWFkMy01ZDg4M2M3YmRkZWYiLCJpc19hbm9ueW1vdXMiOmZhbHNlfQ.BkLcnQkOY0O3draH1xJzId6GV8lH3k6G1h31jJFHDus", token_type: "bearer", expires_in: 3600, expires_at: 1761745958, refresh_token: "22nlvq4zkdzr", user: {…}, weak_password: null }
+useAppStore.js:120:15
+Intentando agregar producto con datos: 
+Object { storeId: "tienda1", categoryId: "8b173ac9-93d5-46b7-9176-1e59d38ad343", subcategoryId: "", initialStock: "21", name: "mayonesa", price: 25, cost: 10, barcode: null, unit: "unidad", image_url: null }
+useAppStore.js:1092:15
+Datos extraídos - storeId: tienda1 categoryId: 8b173ac9-93d5-46b7-9176-1e59d38ad343 subcategoryId: <empty string> initialStock: 21 rest: 
+Object { name: "mayonesa", price: 25, cost: 10, barcode: null, unit: "unidad", image_url: null }
+useAppStore.js:1095:15
+Intentando agregar producto con datos: 
+Object { name: "mayonesa", price: 25, cost: 10, barcode: null, unit: "unidad", image_url: null, categoryId: "8b173ac9-93d5-46b7-9176-1e59d38ad343", subcategoryId: "", createdAt: "2025-10-29T12:54:02.297Z", updatedAt: "2025-10-29T12:54:02.297Z" }
+supabaseAPI.js:34:11
+Datos mapeados para insertar en products: 
+Object { name: "mayonesa", price: 25, cost: 10, barcode: null, unit: "unidad", image_url: null, category_id: "8b173ac9-93d5-46b7-9176-1e59d38ad343", created_at: "2025-10-29T12:54:02.297Z", updated_at: "2025-10-29T12:54:02.297Z" }
+supabaseAPI.js:84:11

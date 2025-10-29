@@ -14,10 +14,16 @@ import {
   updateUser,
   getStores,
   getInventoryBatches,
+  addInventoryBatch,
+  updateInventoryBatch,
   getSales,
   addSale,
   getClients,
   addClient,
+  updateClient,
+  grantCredit,
+  recordPayment,
+  liquidateCredit,
   getTransfers,
   getShoppingList,
   getExpenses,
@@ -26,6 +32,7 @@ import {
 } from '../utils/supabaseAPI';
 import offlineStorage from '../utils/offlineStorage';
 import { auth, supabase } from '../config/firebase';
+import systemEventService from '../services/systemEventService';
 
 
 const useAppStore = create((set, get) => ({
@@ -95,6 +102,109 @@ const useAppStore = create((set, get) => ({
       get().updateNetworkStatus(false);
     });
   },
+
+  // Initialize auth state listener
+  initAuthListener: () => {
+    // Check if there's already a subscription to avoid duplicates
+    if (get().authSubscription) {
+      try {
+        // Unsubscribe from the existing subscription first
+        get().authSubscription.unsubscribe();
+      } catch (error) {
+        console.warn("Error unsubscribing from previous auth listener:", error);
+      }
+    }
+    
+    // Set up a listener for auth state changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log('Auth state changed:', event, session);
+      
+      if (event === 'SIGNED_IN' && session) {
+        // User just signed in
+        try {
+          const userDoc = await getUser(session.user.id);
+          if (userDoc) {
+            // Only emit login notification if user was not already logged in
+            const previousUser = get().currentUser;
+            
+            // Set the current view based on role and store assignment
+            let currentView = 'pos';
+            if (userDoc.role === 'admin' || userDoc.role === 'gerente') {
+              currentView = 'admin-dashboard';
+            } else if (userDoc.role === 'cashier' || userDoc.role === 'cajera') {
+              // For cashiers, make sure they have a store assigned
+              if (!userDoc.storeId) {
+                currentView = 'unauthorized'; // Redirect to unauthorized page if no store assigned
+              }
+            }
+            
+            set({
+              currentUser: userDoc,
+              currentView: currentView,
+            });
+            
+            // Only emit notification if this is a new login (not a session refresh)
+            if (!previousUser || previousUser.id !== userDoc.id) {
+              // Emit notification for user login
+              systemEventService.emitUserLoggedIn(userDoc);
+            }
+          }
+        } catch (error) {
+          console.error("Error fetching user data after sign in:", error);
+        }
+      } else if (event === 'SIGNED_OUT') {
+        // User signed out
+        set({ 
+          currentUser: null, 
+          currentView: 'login', 
+          cart: [],
+          // Reset all data to empty arrays
+          products: [],
+          categories: [],
+          users: [],
+          stores: [],
+          clients: [],
+          inventoryBatches: [],
+          transfers: [],
+          salesHistory: [],
+          expenses: [],
+          shoppingList: [],
+          cashClosings: [],
+        });
+      } else if (event === 'USER_UPDATED' && session) {
+        // User data was updated
+        try {
+          const userDoc = await getUser(session.user.id);
+          if (userDoc) {
+            set({ currentUser: userDoc });
+          }
+        } catch (error) {
+          console.error("Error fetching updated user data:", error);
+        }
+      } else if (event === 'PASSWORD_RECOVERY') {
+        // Password recovery event
+        console.log('Password recovery event');
+      } else if (event === 'TOKEN_REFRESHED') {
+        // Token was refreshed
+        console.log('Auth token refreshed');
+      }
+    });
+
+    // Store the subscription to be able to unsubscribe later
+    set({ authSubscription: subscription });
+    
+    // Return unsubscribe function
+    return () => {
+      try {
+        subscription.unsubscribe();
+      } catch (error) {
+        console.warn("Error unsubscribing from auth listener:", error);
+      }
+    };
+  },
+  
+  // Store for the auth subscription to prevent duplicates
+  authSubscription: null,
   
   // Sync pending operations when online
   syncPendingOperations: async () => {
@@ -154,9 +264,18 @@ const useAppStore = create((set, get) => ({
       // Try to load from network first if online
       if (get().isOnline) {
         const products = await getProducts();
-        set({ products });
+        // Map category_id back to categoryId and subcategory_id back to subcategoryId
+        const mappedProducts = products.map(product => ({
+          ...product,
+          categoryId: product.category_id,
+          subcategoryId: product.subcategory_id,
+          // Also maintain the old fields for compatibility
+          category_id: product.category_id,
+          subcategory_id: product.subcategory_id
+        }));
+        set({ products: mappedProducts });
         // Store in offline storage for later use
-        await Promise.all(products.map(product => 
+        await Promise.all(mappedProducts.map(product => 
           offlineStorage.updateData('products', product.id, product)
         ));
       } else {
@@ -264,20 +383,52 @@ const useAppStore = create((set, get) => ({
     try {
       if (get().isOnline) {
         const inventoryBatches = await getInventoryBatches();
-        set({ inventoryBatches });
+        // Map database field names back to our expected field names
+        const mappedInventoryBatches = inventoryBatches.map(batch => ({
+          ...batch,
+          inventoryId: batch.id || batch.inventoryId, // Use the database id as inventoryId
+          productId: batch.product_id || batch.productId,
+          locationId: batch.location_id || batch.locationId,
+          quantity: batch.quantity || batch.quantity,
+          expirationDate: batch.expiration_date || batch.expirationDate,
+          // Maintain old fields for compatibility
+          id: batch.id,
+          product_id: batch.product_id,
+          location_id: batch.location_id,
+          expiration_date: batch.expiration_date
+        }));
+        set({ inventoryBatches: mappedInventoryBatches });
         // Store in offline storage
-        await Promise.all(inventoryBatches.map(batch => 
+        await Promise.all(mappedInventoryBatches.map(batch => 
           offlineStorage.updateData('inventoryBatches', batch.inventoryId, batch)
         ));
       } else {
         const offlineInventoryBatches = await offlineStorage.getAllData('inventoryBatches');
-        set({ inventoryBatches: offlineInventoryBatches });
+        // Also ensure offline batches are properly mapped
+        const mappedOfflineBatches = offlineInventoryBatches.map(batch => ({
+          ...batch,
+          inventoryId: batch.id || batch.inventoryId,
+          productId: batch.product_id || batch.productId,
+          locationId: batch.location_id || batch.locationId,
+          quantity: batch.quantity || batch.quantity,
+          expirationDate: batch.expiration_date || batch.expirationDate,
+        }));
+        set({ inventoryBatches: mappedOfflineBatches });
       }
     } catch (error) {
       console.error("Error loading inventory batches:", error);
       try {
         const offlineInventoryBatches = await offlineStorage.getAllData('inventoryBatches');
-        set({ inventoryBatches: offlineInventoryBatches });
+        // Also ensure offline batches are properly mapped
+        const mappedOfflineBatches = offlineInventoryBatches.map(batch => ({
+          ...batch,
+          inventoryId: batch.id || batch.inventoryId,
+          productId: batch.product_id || batch.productId,
+          locationId: batch.location_id || batch.locationId,
+          quantity: batch.quantity || batch.quantity,
+          expirationDate: batch.expiration_date || batch.expirationDate,
+        }));
+        set({ inventoryBatches: mappedOfflineBatches });
       } catch (offlineError) {
         console.error("Error loading inventory batches from offline storage:", offlineError);
       }
@@ -398,8 +549,9 @@ const useAppStore = create((set, get) => ({
   },
   updateClient: async (id, updatedData) => {
     try {
-      // Implementation will depend on your Firestore update function
-      // For now, we'll reload clients after updating
+      await updateClient(id, updatedData);
+      
+      // Reload clients to reflect the change
       await get().loadClients();
       
       return { success: true };
@@ -422,8 +574,9 @@ const useAppStore = create((set, get) => ({
   },
   grantCredit: async (clientId, amount) => {
     try {
-      // Implementation will depend on your Firestore update function
-      // For now, we'll reload clients after updating credit
+      await grantCredit(clientId, amount);
+      
+      // Reload clients to reflect the change
       await get().loadClients();
       
       return { success: true };
@@ -434,8 +587,9 @@ const useAppStore = create((set, get) => ({
   },
   recordPayment: async (clientId, amount) => {
     try {
-      // Implementation will depend on your Firestore update function
-      // For now, we'll reload clients after recording payment
+      await recordPayment(clientId, amount);
+      
+      // Reload clients to reflect the change
       await get().loadClients();
       
       return { success: true };
@@ -446,8 +600,9 @@ const useAppStore = create((set, get) => ({
   },
   liquidateCredit: async (clientId) => {
     try {
-      // Implementation will depend on your Firestore update function
-      // For now, we'll reload clients after liquidating credit
+      await liquidateCredit(clientId);
+      
+      // Reload clients to reflect the change
       await get().loadClients();
       
       return { success: true };
@@ -540,12 +695,27 @@ const useAppStore = create((set, get) => ({
       // Fetch user details from Supabase
       const userDoc = await getUser(data.user.id);
       if (userDoc) {
+        // Set the current view based on role and store assignment
+        let currentView = 'pos';
+        if (userDoc.role === 'admin' || userDoc.role === 'gerente') {
+          currentView = 'admin-dashboard';
+        } else if (userDoc.role === 'cashier' || userDoc.role === 'cajera') {
+          // For cashiers, make sure they have a store assigned
+          if (!userDoc.storeId) {
+            return { success: false, error: "Usuario no tiene tienda asignada. Contacte al administrador." };
+          }
+        }
+        
         set({
           currentUser: userDoc,
-          currentView: userDoc.role === 'admin' || userDoc.role === 'gerente' ? 'admin-dashboard' : 'pos',
+          currentView: currentView,
         });
         // Initialize the app data after login
         await get().initialize();
+        
+        // Emitir notificación de inicio de sesión
+        systemEventService.emitUserLoggedIn(userDoc);
+        
         return { success: true, user: userDoc };
       } else {
         return { success: false, error: "Usuario no encontrado en la base de datos" };
@@ -732,6 +902,15 @@ const useAppStore = create((set, get) => ({
 
       get().checkAllAlerts();
       
+      // Emitir notificación de venta completada
+      systemEventService.emitSaleCompleted({
+        id: offlineSaleId,
+        total: finalTotal,
+        cashier: currentUser ? currentUser.name : 'Unknown',
+        clientName: 'Contado',
+        cart: cart
+      });
+      
       return { success: true, saleId: offlineSaleId, offline: true };
     }
 
@@ -753,6 +932,15 @@ const useAppStore = create((set, get) => ({
       });
 
       get().checkAllAlerts();
+      
+      // Emitir notificación de venta completada
+      systemEventService.emitSaleCompleted({
+        id: saleId,
+        total: finalTotal,
+        cashier: currentUser ? currentUser.name : 'Unknown',
+        clientName: 'Contado',
+        cart: cart
+      });
       
       return { success: true, saleId };
     } catch (error) {
@@ -839,6 +1027,25 @@ const useAppStore = create((set, get) => ({
     get().checkAllAlerts();
   },
 
+  updateInventoryBatch: async (inventoryId, updatedData) => {
+    try {
+      // Update the inventory batch in the database
+      // The inventoryId here corresponds to the 'id' field in the database
+      await updateInventoryBatch(inventoryId, updatedData);
+      
+      // Reload inventory batches to reflect the changes
+      await get().loadInventoryBatches();
+      
+      // Update alerts based on the new quantities
+      get().checkAllAlerts();
+      
+      return { success: true };
+    } catch (error) {
+      console.error("Error updating inventory batch:", error);
+      return { success: false, error: error.message };
+    }
+  },
+
   receiveTransfer: (transferId, receivedItems) => {
     const { inventoryBatches } = get();
     let updatedBatches = JSON.parse(JSON.stringify(inventoryBatches));
@@ -882,9 +1089,26 @@ const useAppStore = create((set, get) => ({
   // --- LÓGICA DE PRODUCTOS ---
   addProduct: async (productData) => {
     try {
-      const { storeId, categoryId, subcategoryId, ...rest } = productData;
+      console.log("Intentando agregar producto con datos:", productData);
+      const { storeId, categoryId, subcategoryId, initialStock, ...rest } = productData;
       
-      // Add product to Firestore
+      console.log("Datos extraídos - storeId:", storeId, "categoryId:", categoryId, "subcategoryId:", subcategoryId, "initialStock:", initialStock, "rest:", rest);
+      
+      // Validate required fields
+      if (!storeId) {
+        throw new Error("storeId is required for product creation");
+      }
+      if (!categoryId) {
+        throw new Error("categoryId is required for product creation");
+      }
+      if (!rest.name) {
+        throw new Error("Product name is required for product creation");
+      }
+      if (typeof rest.price === 'undefined' || rest.price === null) {
+        throw new Error("Product price is required for product creation");
+      }
+      
+      // Add product to Supabase
       const productId = await addProduct({
         ...rest,
         categoryId,
@@ -892,25 +1116,48 @@ const useAppStore = create((set, get) => ({
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
       });
+      
+      console.log("Producto agregado con ID:", productId);
 
-      // Add initial inventory batch to Firestore 
-      await addInventoryBatch({
-        productId: productId,
-        locationId: storeId,
-        quantity: 0, // Initial quantity is 0, it will be added later
-        cost: rest.cost || 0,
-        expirationDate: rest.expirationDate || null,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      });
+      // Add initial inventory batch to Supabase 
+      // Only add inventory batch if initialStock is provided and greater than 0
+      if (initialStock && parseInt(initialStock) > 0) {
+        console.log("Agregando lote de inventario inicial para producto:", productId, "cantidad:", parseInt(initialStock));
+        await addInventoryBatch({
+          product_id: productId,
+          location_id: storeId,
+          quantity: parseInt(initialStock) || 0, // Usar la cantidad inicial del formulario
+          cost: rest.cost || 0,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        });
+        console.log("Lote de inventario inicial agregado exitosamente");
+      } else {
+        console.log("No se agregó lote de inventario inicial - cantidad:", initialStock);
+      }
 
       // Reload products and inventory to reflect the changes
+      console.log("Recargando productos e inventario...");
       await get().loadProducts();
       await get().loadInventoryBatches();
+      console.log("Productos e inventario recargados exitosamente");
       
+      // Emitir notificación de producto agregado
+      const category = get().categories.find(cat => cat.id === categoryId);
+      systemEventService.emit('product_added', {
+        productId: productId,
+        productName: rest.name,
+        categoryName: category?.name || 'Sin categoría',
+        userId: get().currentUser?.id || 'system', // Cambiado de .uid a .id
+        storeId: storeId
+      });
+      
+      console.log("Producto agregado exitosamente con ID:", productId);
       return { success: true, id: productId };
     } catch (error) {
-      console.error("Error adding product:", error);
+      console.error("Error detallado al agregar producto:", error);
+      console.error("Mensaje de error:", error.message);
+      console.error("Stack trace:", error.stack);
       return { success: false, error: error.message };
     }
   },
@@ -932,10 +1179,19 @@ const useAppStore = create((set, get) => ({
     }
   },
 
-  deleteProduct: (id) => {
-    set(state => ({
-      products: state.products.filter(product => product.id !== id)
-    }));
+  deleteProduct: async (id) => {
+    try {
+      // Eliminar el producto de Supabase
+      await deleteProduct(id);
+      
+      // Actualizar la lista de productos en el estado
+      await get().loadProducts();
+      
+      return { success: true };
+    } catch (error) {
+      console.error("Error deleting product:", error);
+      return { success: false, error: error.message };
+    }
   },
   checkAllAlerts: () => {
     const { inventoryBatches, products, stores, alertSettings } = get();
@@ -1012,50 +1268,167 @@ const useAppStore = create((set, get) => ({
     });
   },
   // --- LÓGICA DE USUARIOS ---
-  addUser: (userData) => {
-    const newUser = { ...userData, uid: `user-${Date.now()}` };
-    set(state => ({
-      users: [...state.users, newUser]
-    }));
+  addUser: async (userData) => {
+    try {
+      const { email, password, ...userDetails } = userData;
+      
+      // First, check if user already exists in the users table
+      const { data: existingUsers, error: fetchError } = await supabase
+        .from('users')
+        .select('id')
+        .eq('email', email)
+        .limit(1);
+
+      if (fetchError) {
+        console.error("Error checking existing user:", fetchError);
+      } else if (existingUsers && existingUsers.length > 0) {
+        return { success: false, error: 'Ya existe un usuario con este email.' };
+      }
+
+      // Then, create the user in Supabase Auth
+      const { data: { user: authUser }, error: authError } = await supabase.auth.signUp({
+        email,
+        password,
+      });
+
+      if (authError) {
+        console.error("Error creating user in Supabase Auth:", authError);
+        // Return more specific error information based on the type of error
+        if (authError.message.includes('User already registered')) {
+          return { success: false, error: 'Ya existe un usuario con este email.' };
+        }
+        return { success: false, error: authError.message };
+      }
+
+      // If authUser is null (email confirmation required), handle accordingly
+      if (!authUser) {
+        return { success: false, error: 'La cuenta fue creada pero requiere confirmación de email.' };
+      }
+
+      // Then, add the user details to the users table
+      const userDataWithId = { 
+        id: authUser.id,
+        email: authUser.email,
+        ...userDetails
+      };
+      
+      const userId = await addUser(userDataWithId);
+      
+      // Reload users to reflect the change
+      await get().loadUsers();
+      
+      return { success: true, id: userId };
+    } catch (error) {
+      console.error("Error adding user:", error);
+      return { success: false, error: error.message };
+    }
   },
 
-  updateUser: (uid, updatedData) => {
-    set(state => ({
-      users: state.users.map(user => user.uid === uid ? { ...user, ...updatedData } : user)
-    }));
+  updateUser: async (uid, updatedData) => {
+    try {
+      // If password is being updated, we need to handle it separately
+      let passwordToUpdate = null;
+      const updatedDataWithoutPassword = { ...updatedData };
+      
+      if (updatedData.password) {
+        passwordToUpdate = updatedData.password;
+        delete updatedDataWithoutPassword.password;
+      }
+      
+      // Map storeId to store_id if it exists
+      const mappedUpdatedData = { ...updatedDataWithoutPassword };
+      if (mappedUpdatedData.storeId !== undefined) {
+        mappedUpdatedData.store_id = mappedUpdatedData.storeId;
+        delete mappedUpdatedData.storeId;
+      }
+      
+      // Update user in Supabase users table (excluding password)
+      if (Object.keys(mappedUpdatedData).length > 0) {
+        await updateUser(uid, mappedUpdatedData);
+      }
+      
+      // If password was provided, update it via Supabase Auth
+      if (passwordToUpdate) {
+        // Note: Changing password via Supabase Admin API requires special permissions
+        // This is typically done by the user themselves using update user's own password
+        // For now, we'll just save the password update request and handle it differently
+        console.warn("Password update functionality requires special handling and may not be directly supported via client library");
+      }
+      
+      // Reload users to reflect the change
+      await get().loadUsers();
+      
+      return { success: true };
+    } catch (error) {
+      console.error("Error updating user:", error);
+      return { success: false, error: error.message };
+    }
   },
 
-  deleteUser: (uid) => {
-    set(state => ({
-      users: state.users.filter(user => user.uid !== uid)
-    }));
+  deleteUser: async (uid) => {
+    try {
+      // Delete user from Supabase users table
+      const { error } = await supabase
+        .from('users')
+        .delete()
+        .eq('id', uid);
+
+      if (error) {
+        console.error("Error deleting user from Supabase:", error);
+        throw new Error(error.message);
+      }
+      
+      // Reload users to reflect the change
+      await get().loadUsers();
+      
+      return { success: true };
+    } catch (error) {
+      console.error("Error deleting user:", error);
+      return { success: false, error: error.message };
+    }
   },
 
   // --- LÓGICA DE CATEGORÍAS ---
-  addCategory: (categoryData) => {
-    const newCategory = { ...categoryData, id: `cat-${Date.now()}`, subcategories: [] };
-    set(state => {
-      if (newCategory.parentId) {
-        const parentCategory = state.categories.find(c => c.id === newCategory.parentId);
-        if (parentCategory) {
-          parentCategory.subcategories.push(newCategory);
-          return { categories: [...state.categories] };
-        }
-      }
-      return { categories: [...state.categories, newCategory] };
-    });
+  addCategory: async (categoryData) => {
+    try {
+      const categoryId = await addCategory(categoryData);
+      
+      // Reload categories to reflect the change
+      await get().loadCategories();
+      
+      return { success: true, id: categoryId };
+    } catch (error) {
+      console.error("Error adding category:", error);
+      return { success: false, error: error.message };
+    }
   },
 
-  updateCategory: (id, updatedData) => {
-    set(state => ({
-      categories: state.categories.map(category => category.id === id ? { ...category, ...updatedData } : category)
-    }));
+  updateCategory: async (id, updatedData) => {
+    try {
+      await updateCategory(id, updatedData);
+      
+      // Reload categories to reflect the change
+      await get().loadCategories();
+      
+      return { success: true };
+    } catch (error) {
+      console.error("Error updating category:", error);
+      return { success: false, error: error.message };
+    }
   },
 
-  deleteCategory: (id) => {
-    set(state => ({
-      categories: state.categories.filter(category => category.id !== id)
-    }));
+  deleteCategory: async (id) => {
+    try {
+      await deleteCategory(id);
+      
+      // Reload categories to reflect the change
+      await get().loadCategories();
+      
+      return { success: true };
+    } catch (error) {
+      console.error("Error deleting category:", error);
+      return { success: false, error: error.message };
+    }
   },
 
   handleCashClosing: (initialCash) => {
@@ -1154,8 +1527,19 @@ const useAppStore = create((set, get) => ({
   // --- ACTIONS ---
 
   // Inicialización
+  initialized: false, // Track if the app has been initialized
+  
   initialize: async () => {
     console.log("useAppStore initialize function called.");
+    
+    // Only initialize once
+    if (get().initialized) {
+      console.log("App already initialized, skipping initialization");
+      return;
+    }
+
+    set({ initialized: true }); // Mark as initialized to prevent multiple initializations
+
     const storedTicketSettings = localStorage.getItem('ticketSettings');
     const storedDarkMode = localStorage.getItem('darkMode');
     let initialTicketSettings = get().ticketSettings; // Get default settings
@@ -1171,26 +1555,61 @@ const useAppStore = create((set, get) => ({
       darkModePreference = JSON.parse(storedDarkMode);
     }
 
+    // Check if there's an active session with Supabase
+    const { data: { session } } = await supabase.auth.getSession();
+    
+    if (session) {
+      // If there's an active session, fetch user details and set current user
+      try {
+        const userDoc = await getUser(session.user.id);
+        if (userDoc) {
+          // Set the current view based on role and store assignment
+          let currentView = 'pos';
+          if (userDoc.role === 'admin' || userDoc.role === 'gerente') {
+            currentView = 'admin-dashboard';
+          } else if (userDoc.role === 'cashier' || userDoc.role === 'cajera') {
+            // For cashiers, make sure they have a store assigned
+            if (!userDoc.storeId) {
+              currentView = 'unauthorized'; // Redirect to unauthorized page if no store assigned
+            }
+          }
+          
+          set({
+            currentUser: userDoc,
+            currentView: currentView,
+          });
+        }
+      } catch (error) {
+        console.error("Error fetching user data on initialization:", error);
+        // If there's an error, the user session might be invalid, so we'll continue without a user
+      }
+    }
+
+    // Initialize auth state listener
+    get().initAuthListener();
+
     // Initialize network listeners for offline support
     get().initNetworkListeners();
 
     // Initialize Supabase collections if needed
     await initializeSupabaseCollections();
 
-    // Load data from Firebase
-    await Promise.all([
-      get().loadProducts(),
-      get().loadCategories(), 
-      get().loadUsers(),
-      get().loadStores(),
-      get().loadInventoryBatches(),
-      get().loadSalesHistory(),
-      get().loadClients(),
-      get().loadTransfers(),
-      get().loadShoppingList(),
-      get().loadExpenses(),
-      get().loadCashClosings(),
-    ]);
+    // Load data from Firebase only if there's a current user
+    if (get().currentUser) {
+      await Promise.all([
+        get().loadProducts(),
+        get().loadCategories(), 
+        get().loadUsers(),
+        get().loadStores(),
+        get().loadInventoryBatches(),
+        get().loadSalesHistory(),
+        get().loadClients(),
+        get().loadTransfers(),
+        get().loadShoppingList(),
+        get().loadExpenses(),
+        get().loadCashClosings(),
+      ]);
+    }
 
     set({
       ticketSettings: initialTicketSettings, // Set merged settings
@@ -1199,25 +1618,6 @@ const useAppStore = create((set, get) => ({
       offlineMode: !navigator.onLine, // Set initial offline mode
     });
     get().checkAllAlerts();
-  },
-
-  addUser: (userData) => {
-    const newUser = { ...userData, uid: `user-${Date.now()}` };
-    set(state => ({
-      users: [...state.users, newUser]
-    }));
-  },
-
-  updateUser: (uid, updatedData) => {
-    set(state => ({
-      users: state.users.map(user => user.uid === uid ? { ...user, ...updatedData } : user)
-    }));
-  },
-
-  deleteUser: (uid) => {
-    set(state => ({
-      users: state.users.filter(user => user.uid !== uid)
-    }));
   },
 
 }));

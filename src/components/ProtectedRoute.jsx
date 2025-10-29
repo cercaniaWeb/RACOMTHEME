@@ -10,7 +10,15 @@ const ProtectedRoute = ({ children, roles }) => {
     return <Navigate to="/login" />;
   }
 
-  if (roles && !roles.includes(currentUser.role)) {
+  // Handle both 'cajera' and 'cashier' roles for compatibility
+  const userRole = currentUser.role;
+  const hasAccess = roles.some(role => 
+    role === userRole || 
+    (role === 'cajera' && userRole === 'cashier') || 
+    (role === 'cashier' && userRole === 'cajera')
+  );
+
+  if (!hasAccess) {
     return <Navigate to="/unauthorized" />;
   }
 

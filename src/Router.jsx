@@ -25,7 +25,7 @@ const Router = () => {
 
         <Route
           path="/pos/:storeId"
-          element={<ProtectedRoute roles={['cajera', 'gerente', 'admin']}><POSPage /></ProtectedRoute>}
+          element={<ProtectedRoute roles={['cajera', 'cashier', 'gerente', 'admin']}><POSPage /></ProtectedRoute>}
         />
         <Route
           path="/inventory"

@@ -1,7 +1,7 @@
 import React from 'react';
 import useAppStore from '../../store/useAppStore';
 
-const Input = ({ type = 'text', placeholder, value, onChange, className = '', icon: Icon, prefix, ...rest }) => {
+const Input = React.forwardRef(({ type = 'text', placeholder, value, onChange, className = '', icon: Icon, prefix, ...rest }, ref) => {
   const { darkMode } = useAppStore();
 
   const inputClass = darkMode
@@ -21,6 +21,7 @@ const Input = ({ type = 'text', placeholder, value, onChange, className = '', ic
       {Icon && <Icon className={iconClass} />}
       {prefix && <span className={prefixClass}>{prefix}</span>}
       <input
+        ref={ref}
         type={type}
         placeholder={placeholder}
         value={value}
@@ -30,6 +31,6 @@ const Input = ({ type = 'text', placeholder, value, onChange, className = '', ic
       />
     </div>
   );
-};
+});
 
 export default Input;

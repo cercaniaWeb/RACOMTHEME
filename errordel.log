@@ -1,0 +1,36 @@
+unreachable code after return statement react-zxing.js:9962:9
+Error al analizar el valor para '-webkit-text-size-adjust'.  Declaración rechazada. inventory:141:29
+Propiedad desconocida '-moz-osx-font-smoothing'.  Declaración rechazada. inventory:1541:27
+Juego de reglas ignoradas debido a un mal selector. inventory:1736:27
+Juego de reglas ignoradas debido a un mal selector. inventory:1756:33
+Error registrando Service Worker: DOMException: The operation is insecure. notificationService.js:34:17
+Error eliminando producto: 
+Object { code: "23503", details: 'Key (id)=(2bd40c3e-4d63-4dd0-99a0-0ff8734c8ed3) is still referenced from table "inventory_batches".', hint: null, message: 'update or delete on table "products" violates foreign key constraint "inventory_batches_product_id_fkey" on table "inventory_batches"' }
+supabaseAPI.js:174:13
+Error deleting product: Error: update or delete on table "products" violates foreign key constraint "inventory_batches_product_id_fkey" on table "inventory_batches"
+    deleteProduct supabaseAPI.js:175
+useAppStore.js:1125:15
+Error eliminando producto: 
+Object { code: "23503", details: 'Key (id)=(522154a9-9732-42d6-a92c-27c83e8f3c5a) is still referenced from table "inventory_batches".', hint: null, message: 'update or delete on table "products" violates foreign key constraint "inventory_batches_product_id_fkey" on table "inventory_batches"' }
+supabaseAPI.js:174:13
+Error deleting product: Error: update or delete on table "products" violates foreign key constraint "inventory_batches_product_id_fkey" on table "inventory_batches"
+    deleteProduct supabaseAPI.js:175
+useAppStore.js:1125:15
+Error eliminando producto: 
+Object { code: "23503", details: 'Key (id)=(402283d3-dd7c-42a1-92c0-1498325fb65d) is still referenced from table "inventory_batches".', hint: null, message: 'update or delete on table "products" violates foreign key constraint "inventory_batches_product_id_fkey" on table "inventory_batches"' }
+supabaseAPI.js:174:13
+Error deleting product: Error: update or delete on table "products" violates foreign key constraint "inventory_batches_product_id_fkey" on table "inventory_batches"
+    deleteProduct supabaseAPI.js:175
+useAppStore.js:1125:15
+Error eliminando producto: 
+Object { code: "23503", details: 'Key (id)=(9c9616ff-4512-4942-a34f-05e13aaa19b7) is still referenced from table "inventory_batches".', hint: null, message: 'update or delete on table "products" violates foreign key constraint "inventory_batches_product_id_fkey" on table "inventory_batches"' }
+supabaseAPI.js:174:13
+Error deleting product: Error: update or delete on table "products" violates foreign key constraint "inventory_batches_product_id_fkey" on table "inventory_batches"
+    deleteProduct supabaseAPI.js:175
+useAppStore.js:1125:15
+Error eliminando producto: 
+Object { code: "23503", details: 'Key (id)=(d2134eea-f770-40a9-bb4c-737884294af2) is still referenced from table "inventory_batches".', hint: null, message: 'update or delete on table "products" violates foreign key constraint "inventory_batches_product_id_fkey" on table "inventory_batches"' }
+supabaseAPI.js:174:13
+Error deleting product: Error: update or delete on table "products" violates foreign key constraint "inventory_batches_product_id_fkey" on table "inventory_batches"
+    deleteProduct supabaseAPI.js:175
+useAppStore.js:1125:15

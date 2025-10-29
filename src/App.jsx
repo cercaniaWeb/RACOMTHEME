@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import Router from './Router';
 import useAppStore from './store/useAppStore';
+import NotificationProvider from './components/notifications/NotificationProvider';
 
 const App = () => {
   const { initialize, darkMode, initNetworkListeners, syncPendingOperations, isOnline } = useAppStore();
@@ -33,11 +34,13 @@ const App = () => {
   }, [syncPendingOperations]);
 
   return (
-    <div className={`min-h-screen w-full ${darkMode ? 'dark bg-gradient-to-br from-slate-900 to-slate-800' : 'bg-gradient-to-br from-slate-100 to-blue-50'}`}>
-      <div className="flex flex-col h-screen">
-        <Router />
+    <NotificationProvider>
+      <div className={`min-h-screen w-full ${darkMode ? 'dark bg-gradient-to-br from-slate-900 to-slate-800' : 'bg-gradient-to-br from-slate-100 to-blue-50'}`}>
+        <div className="flex flex-col h-screen">
+          <Router />
+        </div>
       </div>
-    </div>
+    </NotificationProvider>
   );
 };
 
